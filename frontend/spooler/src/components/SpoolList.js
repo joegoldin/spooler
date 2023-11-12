@@ -2,6 +2,10 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
+const calculateTotalUsed = (historyEntries) => {
+  return historyEntries.reduce((total, entry) => total + parseFloat(entry.used_amount), 0);
+};
+
 function SpoolList({
   title,
   onEdit,
@@ -62,7 +66,7 @@ function SpoolList({
             >
               <li className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
-                  {spool.name} ({spool.color}) - {spool.currentWeight}g left
+                  {spool.name} ({spool.color}) - {calculateTotalUsed(spool.usage_history)}g used
                 </div>
                 <div className="mt-2">
                   {spool.usage_history && spool.usage_history.length > 0 && (
