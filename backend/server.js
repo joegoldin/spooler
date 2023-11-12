@@ -15,15 +15,23 @@ const db = new sqlite3.Database('./filamentDB.sqlite', (err) => {
 });
 
 db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS spools (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        color TEXT,
-        initialWeight INTEGER,
-        currentWeight INTEGER,
-        sort_order INTEGER IDENTITY(1,1) NOT NULL,   
-        is_archived INTEGER DEFAULT 0
-    )`);
+  db.run(`CREATE TABLE IF NOT EXISTS spools (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      color TEXT,
+      initialWeight INTEGER,
+      currentWeight INTEGER,
+      sort_order INTEGER IDENTITY(1,1) NOT NULL,   
+      is_archived INTEGER DEFAULT 0
+  )`);
+  db.run(`CREATE TABLE IF NOT EXISTS spool_usage_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    spool_id INTEGER NOT NULL,
+    used_amount INTEGER NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    note TEXT,
+    FOREIGN KEY (spool_id) REFERENCES spools(id) ON DELETE CASCADE
+  )`);
 });
 
 app.post("/spools", (req, res) => {
@@ -186,6 +194,8 @@ app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
         res.send({ message: 'Spool usage entry deleted' });
     });
 });
+
+app.get("/spools/top", (req, res) => {
   db.get(
     `SELECT * FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
     [],
