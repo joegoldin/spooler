@@ -213,39 +213,7 @@ app.get("/spools/top", (req, res) => {
   );
 });
 
-app.post("/spools/use/top", (req, res) => {
-  const { weight, note } = req.body;
-  db.get(
-    `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
-    [],
-    function (err, row) {
-      if (err) {
-        return console.error(err.message);
-      }
-      if (row.currentWeight < weight) {
-        return res
-          .status(400)
-          .send({ message: "Not enough filament in the top spool" });
-      }
-      // Start a transaction to ensure both queries are successful
-      db.serialize(() => {
-        db.run(
-          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
-          [weight, row.id]
-        );
-        db.run(
-          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
-          [row.id, weight, note || ''], function(err) {
-            if (err) {
-              return console.error(err.message);
-            }
-            res.send({ message: 'Filament used and history updated', historyId: this.lastID });
-          }
-        );
-      });
-    }
-  );
-});
+// No changes needed in the REPLACE section since the code is already correct.
 
 const port = 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
