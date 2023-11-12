@@ -39,13 +39,27 @@ function App() {
   };
 
   const handleEditHistorySave = (historyEntry) => {
-    // Logic for saving the edited history entry will go here
-    // This will likely involve an API call to update the history entry
-    // and then a re-fetch of the spool data
-    console.log('Save edited history entry:', historyEntry);
-    // Reset editing history entry state
-    setEditingHistoryEntry(null);
-    fetchSpools();
+    fetch(`http://localhost:3000/spools/${historyEntry.spoolId}/history/${historyEntry.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        used_amount: historyEntry.used_amount,
+        note: historyEntry.note,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(() => {
+      setEditingHistoryEntry(null);
+      fetchSpools();
+    })
+    .catch((error) => console.error('Error saving edited history entry:', error));
   };
 
   const handleDeleteHistory = (spoolId) => {
