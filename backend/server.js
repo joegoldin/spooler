@@ -69,7 +69,13 @@ app.post("/spools", (req, res) => {
 
 app.get("/spools", (req, res) => {
   db.all(
-    `SELECT * FROM  spools WHERE is_archived = 0 ORDER BY sort_order`,
+    `SELECT spools.*, 
+    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history
+    FROM spools
+    LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
+    WHERE spools.is_archived = 0
+    GROUP BY spools.id
+    ORDER BY spools.sort_order`,
     [],
     (err, rows) => {
       if (err) {

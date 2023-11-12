@@ -37,8 +37,20 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
               classNames="spool"
               appear={false}
             >
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                {spool.name} ({spool.color}) - {spool.currentWeight}g left
+              <li className="list-group-item">
+                <div className="d-flex justify-content-between align-items-center">
+                  {spool.name} ({spool.color}) - {spool.currentWeight}g left
+                </div>
+                <div className="mt-2">
+                  <strong>Usage History:</strong>
+                  <ul>
+                    {spool.usage_history.map((historyEntry) => (
+                      <li key={historyEntry.id}>
+                        {new Date(historyEntry.timestamp).toLocaleString()}: {historyEntry.used_amount}g - {historyEntry.note}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <div>
                   <button
                     onClick={() => handleSort(spool, "up")}
