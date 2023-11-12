@@ -33,6 +33,20 @@ function App() {
     fetchSpools();
   };
 
+  const handleEditHistory = (spoolId, historyEntry) => {
+    // Logic for handling history edit will go here
+    // This may involve setting some state to open a modal or form for editing
+    console.log('Edit history entry:', spoolId, historyEntry);
+  };
+
+  const handleDeleteHistory = (spoolId) => {
+    // Logic for handling history deletion will go here
+    // This will likely involve an API call to delete the history entry
+    // and then a re-fetch of the spool data
+    console.log('Delete history entry for spool:', spoolId);
+    fetchSpools();
+  };
+
   const onArchive = () => {
     fetchSpools();
   };
@@ -97,6 +111,8 @@ function App() {
           title="Active Spools"
           onEdit={handleEditInit}
           onDelete={handleEditDone}
+          onEditHistory={handleEditHistory}
+          onDeleteHistory={handleDeleteHistory}
           onSort={onSort}
           onArchive={onArchive}
           spools={spools}
@@ -108,6 +124,8 @@ function App() {
         title="Archived Spools"
         onEdit={handleEditInit}
         onDelete={handleEditDone}
+        onEditHistory={handleEditHistory}
+        onDeleteHistory={handleDeleteHistory}
         onSort={onSort}
         onArchive={onUnArchive}
         spools={archivedSpools}
