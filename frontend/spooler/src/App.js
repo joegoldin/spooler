@@ -6,12 +6,17 @@ import "bootstrap/dist/css/bootstrap.min.css"; // Make sure to import Bootstrap 
 
 function App() {
   const [spools, setSpools] = useState([]);
+  const [archivedSpools, setArchivedSpools] = useState([]);
   const [editingSpool, setEditingSpool] = useState(null);
 
   const fetchSpools = () => {
     fetch("http://localhost:3000/spools")
       .then((response) => response.json())
       .then((data) => setSpools(data))
+      .catch((error) => console.error("Error fetching data:", error));
+    fetch("http://localhost:3000/spools/archived")
+      .then((response) => response.json())
+      .then((data) => setArchivedSpools(data))
       .catch((error) => console.error("Error fetching data:", error));
   };
 
@@ -29,6 +34,10 @@ function App() {
   };
 
   const onArchive = () => {
+    fetchSpools();
+  };
+
+  const onUnArchive = () => {
     fetchSpools();
   };
 
@@ -80,10 +89,12 @@ function App() {
     <div className="container mt-5">
       <h1 className="text-center mb-4">Filament Tracker</h1>
       <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
+      <br />
       {editingSpool ? (
         <EditSpool spool={editingSpool} onEdit={handleEditDone} />
       ) : (
         <SpoolList
+          title="Active Spools"
           onEdit={handleEditInit}
           onDelete={handleEditDone}
           onSort={onSort}
@@ -91,6 +102,16 @@ function App() {
           spools={spools}
         />
       )}
+      <br />
+      <br />
+      <SpoolList
+        title="Archived Spools"
+        onEdit={handleEditInit}
+        onDelete={handleEditDone}
+        onSort={onSort}
+        onArchive={onUnArchive}
+        spools={archivedSpools}
+      />
     </div>
   );
 }

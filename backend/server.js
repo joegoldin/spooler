@@ -68,12 +68,29 @@ app.post("/spools", (req, res) => {
 });
 
 app.get("/spools", (req, res) => {
-  db.all(`SELECT * FROM spools`, [], (err, rows) => {
-    if (err) {
-      throw err;
+  db.all(
+    `SELECT * FROM  spools WHERE is_archived = 0 ORDER BY sort_order`,
+    [],
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      res.send(rows);
     }
-    res.send(rows);
-  });
+  );
+});
+
+app.get("/spools/archived", (req, res) => {
+  db.all(
+    `SELECT * FROM  spools WHERE is_archived = 1 ORDER BY sort_order`,
+    [],
+    (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      res.send(rows);
+    }
+  );
 });
 
 app.put("/spools/:id", (req, res) => {
@@ -104,20 +121,20 @@ app.delete("/spools/:id", (req, res) => {
   });
 });
 
-app.post("/spools/use/:id", (req, res) => {
-  const { id } = req.params;
-  const { weight, note } = req.body;
+app.post("/spools/use/top", (req, res) => {
+  const { weight } = req.body;
   db.get(
-    `SELECT currentWeight FROM spools WHERE id = ?`,
-    id,
+    `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
+    [],
     function (err, row) {
       if (err) {
         return console.error(err.message);
       }
       if (row.currentWeight < weight) {
-        return res.status(400).send({ message: "Not enough filament" });
+        return res
+          .status(400)
+          .send({ message: "Not enough filament in the top spool" });
       }
-      // Start a transaction to ensure both queries are successful
       db.serialize(() => {
         db.run(
           `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
@@ -141,20 +158,20 @@ app.post("/spools/use/:id", (req, res) => {
   );
 });
 
-app.post("/spools/use/top", (req, res) => {
-  const { weight } = req.body;
+app.post("/spools/use/:id", (req, res) => {
+  const { id } = req.params;
+  const { weight, note } = req.body;
   db.get(
-    `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
-    [],
+    `SELECT currentWeight FROM spools WHERE id = ?`,
+    id,
     function (err, row) {
       if (err) {
         return console.error(err.message);
       }
       if (row.currentWeight < weight) {
-        return res
-          .status(400)
-          .send({ message: "Not enough filament in the top spool" });
+        return res.status(400).send({ message: "Not enough filament" });
       }
+      // Start a transaction to ensure both queries are successful
       db.serialize(() => {
         db.run(
           `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
@@ -217,12 +234,10 @@ app.get("/spools/:id/history", (req, res) => {
     [id],
     (err, rows) => {
       if (err) {
-        return res
-          .status(500)
-          .send({
-            message: "Error fetching spool usage history",
-            error: err.message,
-          });
+        return res.status(500).send({
+          message: "Error fetching spool usage history",
+          error: err.message,
+        });
       }
       res.send(rows);
     }
@@ -238,12 +253,10 @@ app.put("/spools/:spoolId/history/:entryId", (req, res) => {
     [used_amount, note, entryId, spoolId],
     function (err) {
       if (err) {
-        return res
-          .status(500)
-          .send({
-            message: "Error updating spool usage entry",
-            error: err.message,
-          });
+        return res.status(500).send({
+          message: "Error updating spool usage entry",
+          error: err.message,
+        });
       }
       res.send({ message: "Spool usage entry updated" });
     }
@@ -258,12 +271,10 @@ app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
     [entryId, spoolId],
     function (err) {
       if (err) {
-        return res
-          .status(500)
-          .send({
-            message: "Error deleting spool usage entry",
-            error: err.message,
-          });
+        return res.status(500).send({
+          message: "Error deleting spool usage entry",
+          error: err.message,
+        });
       }
       res.send({ message: "Spool usage entry deleted" });
     }
@@ -271,14 +282,87 @@ app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
 });
 
 app.get("/spools/top", (req, res) => {
+  // First query to get the top spool ID
   db.get(
-    `SELECT * FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
-    [],
+    `
+        SELECT id
+        FROM spools
+        WHERE is_archived = 0
+        ORDER BY sort_order
+        LIMIT 1`,
+    (err, topSpool) => {
+      if (err) {
+        return res.status(500).send({
+          message: "Error fetching top spool ID",
+          error: err.message,
+        });
+      }
+      if (!topSpool) {
+        return res.status(404).send({
+          message: "Top spool not found",
+        });
+      }
+
+      // Use the top spool ID to perform the original spool details query
+      db.get(
+        `
+            SELECT spools.*, 
+              json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history
+            FROM spools
+            LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
+            WHERE spools.id = ?
+            GROUP BY spools.id`,
+        [topSpool.id], // Use the retrieved top spool ID here
+        (err, row) => {
+          if (err) {
+            return res.status(500).send({
+              message: "Error fetching spool details",
+              error: err.message,
+            });
+          }
+          // If the result is not null, parse the usage_history
+          if (row) {
+            row.usage_history = JSON.parse(row.usage_history);
+            res.send(row);
+          } else {
+            // Handle the case if no details are found for the top spool
+            res.status(404).send({
+              message: "Spool details not found",
+            });
+          }
+        }
+      );
+    }
+  );
+});
+
+app.get("/spools/:id", (req, res) => {
+  const { id } = req.params;
+  db.get(
+    `
+        SELECT spools.*, json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history
+        FROM spools
+        LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
+        WHERE spools.id = ?
+        GROUP BY spools.id`,
+    [id],
     (err, row) => {
       if (err) {
-        return console.error(err.message);
+        return res.status(500).send({
+          message: "Error fetching spool details",
+          error: err.message,
+        });
       }
-      res.send(row);
+      // If the result is not null, parse the usage_history
+      if (row) {
+        row.usage_history = JSON.parse(row.usage_history);
+        res.send(row);
+      } else {
+        // Handle the case if no details are found for the top spool
+        res.status(404).send({
+          message: "Spool details not found",
+        });
+      }
     }
   );
 });
