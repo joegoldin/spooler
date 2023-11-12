@@ -81,12 +81,17 @@ app.get("/spools", (req, res) => {
       if (err) {
         throw err;
       }
-      // Convert the usage_history_json string to an actual JSON array
-      const rowsWithParsedHistory = rows.map(row => ({
-        ...row,
-        usage_history: JSON.parse(row.usage_history_json)
-      }));
-      res.send(rowsWithParsedHistory);
+      // Convert the usage_history_json string to an actual JSON array and filter out empty histories
+      const rowsWithFilteredHistory = rows.map(row => {
+        const usageHistory = JSON.parse(row.usage_history_json);
+        if (usageHistory.length > 0) {
+          return { ...row, usage_history: usageHistory };
+        }
+        // Exclude the usage_history property if it's an empty array
+        const { usage_history_json, ...rest } = row;
+        return rest;
+      });
+      res.send(rowsWithFilteredHistory);
     }
   );
 });
