@@ -71,12 +71,30 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
                               <td>{historyEntry.used_amount}g</td>
                               <td>{historyEntry.note}</td>
                               <td>
-                                <button
-                                  onClick={() => handleEditHistory(spool.id, historyEntry)}
-                                  className="btn btn-sm btn-warning mx-1"
-                                >
-                                  Edit
-                                </button>
+                                {editingHistoryEntry && editingHistoryEntry.id === historyEntry.id ? (
+                                  <>
+                                    <input
+                                      type="number"
+                                      value={editingHistoryEntry.used_amount}
+                                      onChange={(e) => setEditingHistoryEntry({ ...editingHistoryEntry, used_amount: e.target.value })}
+                                      className="form-control form-control-sm mx-1"
+                                      style={{ width: 'auto', display: 'inline' }}
+                                    />
+                                    <button
+                                      onClick={() => handleEditHistorySave(editingHistoryEntry)}
+                                      className="btn btn-sm btn-success mx-1"
+                                    >
+                                      Save
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    onClick={() => handleEditHistoryInit(spool.id, historyEntry)}
+                                    className="btn btn-sm btn-warning mx-1"
+                                  >
+                                    Edit
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => handleDeleteHistory(spool.id, historyEntry.id)}
                                   className="btn btn-sm btn-danger mx-1"

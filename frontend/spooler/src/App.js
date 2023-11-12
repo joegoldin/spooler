@@ -8,6 +8,7 @@ function App() {
   const [spools, setSpools] = useState([]);
   const [archivedSpools, setArchivedSpools] = useState([]);
   const [editingSpool, setEditingSpool] = useState(null);
+  const [editingHistoryEntry, setEditingHistoryEntry] = useState(null);
 
   const fetchSpools = () => {
     fetch("http://localhost:3000/spools")
@@ -33,10 +34,18 @@ function App() {
     fetchSpools();
   };
 
-  const handleEditHistory = (spoolId, historyEntry) => {
-    // Logic for handling history edit will go here
-    // This may involve setting some state to open a modal or form for editing
-    console.log('Edit history entry:', spoolId, historyEntry);
+  const handleEditHistoryInit = (spoolId, historyEntry) => {
+    setEditingHistoryEntry({ spoolId, ...historyEntry });
+  };
+
+  const handleEditHistorySave = (historyEntry) => {
+    // Logic for saving the edited history entry will go here
+    // This will likely involve an API call to update the history entry
+    // and then a re-fetch of the spool data
+    console.log('Save edited history entry:', historyEntry);
+    // Reset editing history entry state
+    setEditingHistoryEntry(null);
+    fetchSpools();
   };
 
   const handleDeleteHistory = (spoolId) => {
