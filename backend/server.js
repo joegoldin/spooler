@@ -122,7 +122,9 @@ app.delete("/spools/:id", (req, res) => {
 });
 
 app.post("/spools/use/top", (req, res) => {
-  const { weight } = req.body;
+  console.log("use top", req.params, req.body);
+  const { weight, note, filePath } = req.body;
+  console.log("use top", weight, note);
   db.get(
     `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
     [],
@@ -131,36 +133,20 @@ app.post("/spools/use/top", (req, res) => {
         return console.error(err.message);
       }
       if (row.currentWeight < weight) {
+        console.error("Not enough filament");
         return res
           .status(400)
           .send({ message: "Not enough filament in the top spool" });
       }
-      db.serialize(() => {
-        db.run(
-          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
-          [weight, id]
-        );
-        db.run(
-          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
-          [id, weight, note || ""],
-          function (err) {
-            if (err) {
-              return console.error(err.message);
-            }
-            res.send({
-              message: "Filament used and history updated",
-              historyId: this.lastID,
-            });
-          }
-        );
-      });
+      let message = "File: " + filePath + ", models: " + note;
+      use_weight(res, weight, message, row.id);
     }
   );
 });
 
 app.post("/spools/use/:id", (req, res) => {
   const { id } = req.params;
-  const { weight, note } = req.body;
+  const { weight, note, filePath } = req.body;
   db.get(
     `SELECT currentWeight FROM spools WHERE id = ?`,
     id,
@@ -169,31 +155,37 @@ app.post("/spools/use/:id", (req, res) => {
         return console.error(err.message);
       }
       if (row.currentWeight < weight) {
+        console.error("Not enough filament");
         return res.status(400).send({ message: "Not enough filament" });
       }
-      // Start a transaction to ensure both queries are successful
-      db.serialize(() => {
-        db.run(
-          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
-          [weight, id]
-        );
-        db.run(
-          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
-          [id, weight, note || ""],
-          function (err) {
-            if (err) {
-              return console.error(err.message);
-            }
-            res.send({
-              message: "Filament used and history updated",
-              historyId: this.lastID,
-            });
-          }
-        );
-      });
+      let message = "File: " + filePath + ", models: " + note;
+      use_weight(res, weight, message, row.id);
     }
   );
 });
+
+function use_weight(res, weight, note, id) {
+  db.serialize(() => {
+    db.run(`UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`, [
+      weight,
+      id,
+    ]);
+    db.run(
+      `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+      [id, weight, note || ""],
+      function (err) {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Filament used and history updated with note: " + note);
+        res.send({
+          message: "Filament used and history updated with note: " + note,
+          historyId: this.lastID,
+        });
+      }
+    );
+  });
+}
 
 app.put("/spools/sort/:id", (req, res) => {
   const { id } = req.params;
