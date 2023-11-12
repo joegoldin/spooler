@@ -37,13 +37,22 @@ function App() {
     const index = spools.findIndex((s) => s.id === spoolId);
     // if (index === -1) return; // Spool not found
 
-    let swapIndex = direction === "up" ? index - 1 : index + 1;
-    // if (swapIndex < 0 || swapIndex >= spools.length) return; // Already at the end/start
+    if (index !== -1) {
+      let swapIndex = direction === "up" ? index - 1 : index + 1;
+      if (swapIndex >= 0 && swapIndex < spools.length) {
+        // Swap sort_order values
+        let temp = spools[index].sort_order;
+        spools[index].sort_order = spools[swapIndex].sort_order;
+        spools[swapIndex].sort_order = temp;
 
-    // Swap sort_order values
-    let temp = spools[index].sort_order;
-    spools[index].sort_order = spools[swapIndex].sort_order;
-    spools[swapIndex].sort_order = temp;
+        // Create a new array with the swapped elements
+        let newSpools = [...spools];
+        [newSpools[index], newSpools[swapIndex]] = [newSpools[swapIndex], newSpools[index]];
+
+        // Update the state with the new array
+        setSpools(newSpools);
+      }
+    }
 
     // Now, we'll need to update the backend with both changes
     Promise.all([
