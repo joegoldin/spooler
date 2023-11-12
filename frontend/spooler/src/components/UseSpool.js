@@ -12,28 +12,34 @@ function UseSpool({ onUse }) {
   };
 
   return (
-    <div>
-      <h2>Use Spool</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Weight Used:</label>
-          <input
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Note:</label>
-          <input
-            type="text"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-        </div>
-        <button type="submit">Use</button>
-      </form>
+    <div className="card">
+      <div className="card-header">
+        <h2>Use Spool</h2>
+      </div>
+      <div className="card-body">
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Weight Used:</label>
+            <input
+              type="number"
+              className="form-control"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Note:</label>
+            <input
+              type="text"
+              className="form-control"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Use</button>
+        </form>
+      </div>
     </div>
   );
 }
