@@ -29,7 +29,7 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
       <TransitionGroup component="ul" className="list-group">
         {spools.sort((a, b) => a.sort_order - b.sort_order)
           .map((spool) => (
-            <CSSTransition key={`${spool.id}-${spool.sort_order}`} timeout={500} classNames="spool">
+            <CSSTransition key={spool.id} timeout={500} classNames="spool" appear={false}>
               <li
                 className="list-group-item d-flex justify-content-between align-items-center"
               >
