@@ -9,8 +9,10 @@
 }
 .spool-exit {
   opacity: 1;
+  transform: translateY(0);
 }
 .spool-exit-active {
   opacity: 0;
-  transition: opacity 500ms;
+  transform: translateY(-100%); /* Move the exiting element up by its own height */
+  transition: opacity 500ms, transform 500ms;
 }
