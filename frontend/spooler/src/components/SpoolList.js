@@ -6,6 +6,8 @@ import "./SpoolList.css";
 function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
   const [editingHistoryId, setEditingHistoryId] = useState(null);
   const [editedHistoryEntry, setEditedHistoryEntry] = useState({ used_amount: '', note: '' });
+  const [editingHistoryId, setEditingHistoryId] = useState(null);
+  const [editedHistoryEntry, setEditedHistoryEntry] = useState({ used_amount: '', note: '' });
 
   const handleEditHistoryClick = (spoolId, historyEntry) => {
     setEditingHistoryId(historyEntry.id);
