@@ -214,7 +214,7 @@ app.get("/spools/top", (req, res) => {
 });
 
 app.post("/spools/use/top", (req, res) => {
-  const { weight } = req.body;
+  const { weight, note } = req.body;
   db.get(
     `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
     [],
@@ -227,16 +227,22 @@ app.post("/spools/use/top", (req, res) => {
           .status(400)
           .send({ message: "Not enough filament in the top spool" });
       }
-      db.run(
-        `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
-        [weight, row.id],
-        function (err) {
-          if (err) {
-            return console.error(err.message);
+      // Start a transaction to ensure both queries are successful
+      db.serialize(() => {
+        db.run(
+          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
+          [weight, row.id]
+        );
+        db.run(
+          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+          [row.id, weight, note || ''], function(err) {
+            if (err) {
+              return console.error(err.message);
+            }
+            res.send({ message: 'Filament used and history updated', historyId: this.lastID });
           }
-          res.send({ message: "Filament used from the top spool" });
-        }
-      );
+        );
+      });
     }
   );
 });
