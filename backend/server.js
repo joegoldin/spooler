@@ -176,7 +176,7 @@ app.post("/spools/use/top", (req, res) => {
           .status(400)
           .send({ message: "Not enough filament in the top spool" });
       }
-      let message = "File: " + filePath + ", models: " + note;
+      let message = "File: " + filePath + ", Models: " + note;
       use_weight(res, weight, message, row.id);
     }
   );
@@ -196,7 +196,7 @@ app.post("/spools/use/:id", (req, res) => {
         console.error("Not enough filament");
         return res.status(400).send({ message: "Not enough filament" });
       }
-      let message = "File: " + filePath + ", models: " + note;
+      let message = "File: " + filePath + ", Models: " + note;
       use_weight(res, weight, message, id);
     }
   );
