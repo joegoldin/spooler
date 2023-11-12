@@ -165,11 +165,11 @@ function App() {
         </>
       )}
       <br />
-      <div className="row">
-        <div className="col-md-6">
+      <div className="row d-flex h-100">
+        <div className="col-md-6 d-flex flex-column">
           <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
         </div>
-        <div className="col-md-6">
+        <div className="col-md-6 d-flex flex-column">
           <UseSpool onUse={handleUseSpool} />
         </div>
       </div>
