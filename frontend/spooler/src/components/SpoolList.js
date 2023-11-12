@@ -16,8 +16,9 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isArchived: archived }),
-    }).catch((error) => console.error("Error archiving spool:", error));
-    onArchive();
+    })
+      .then(() => onArchive())
+      .catch((error) => console.error("Error archiving spool:", error));
   };
 
   return (
