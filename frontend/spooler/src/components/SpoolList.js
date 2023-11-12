@@ -2,10 +2,9 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 
 function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/spools/${id}`, { method: "DELETE" }).catch(
-      (error) => console.error("Error deleting spool:", error)
-    );
-    onDelete();
+    fetch(`http://localhost:3000/spools/${id}`, { method: "DELETE" })
+      .then(() => onDelete())
+      .catch((error) => console.error("Error deleting spool:", error));
   };
 
   const handleSort = (spool, direction) => {
