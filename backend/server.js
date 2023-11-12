@@ -31,7 +31,7 @@ app.post("/spools", (req, res) => {
 
   // First, find the lowest sort_order in the database
   db.get(
-    `SELECT MIN(sort_order) as minSortOrder FROM spools`,
+    `SELECT MIN(sort_order) as minSortOrder, max(sort_order) as maxSortOrder FROM spools`,
     [],
     (err, row) => {
       if (err) {
@@ -40,9 +40,9 @@ app.post("/spools", (req, res) => {
 
       // Determine the next sort_order value
       // If no spools exist, start with a default value (e.g., 0)
-      // Otherwise, subtract 1 from the current lowest sort_order
+      // Otherwise, add 1 to the current max sort_order
       const nextSortOrder =
-        row.minSortOrder !== null ? row.minSortOrder - 1 : 0;
+        row.maxSortOrder !== null ? row.maxSortOrder + 1 : 0;
 
       // Insert the new spool with the determined sort_order
       db.run(
@@ -133,6 +133,19 @@ app.put("/spools/archive/:id", (req, res) => {
         return console.error(err.message);
       }
       res.send({ message: "Spool archived status updated" });
+    }
+  );
+});
+
+app.get("/spools/top", (req, res) => {
+  db.get(
+    `SELECT * FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
+    [],
+    (err, row) => {
+      if (err) {
+        return console.error(err.message);
+      }
+      res.send(row);
     }
   );
 });
