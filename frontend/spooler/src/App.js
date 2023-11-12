@@ -148,31 +148,40 @@ function App() {
             spools={spools}
           />
           <br />
-          <br />
-          <SpoolList
-            title="Archived Spools"
-            onEdit={handleEditInit}
-            onDelete={handleEditDone}
-            onEditHistory={handleEditHistoryInit}
-            onDeleteHistory={handleDeleteHistory}
-            onSort={onSort}
-            onArchive={onUnArchive}
-            editingHistoryEntry={editingHistoryEntry}
-            setEditingHistoryEntry={setEditingHistoryEntry}
-            handleEditHistorySave={handleEditHistorySave}
-            spools={archivedSpools}
-          />
         </>
       )}
       <br />
-      <div className="row d-flex" style={{ height: '100%' }}>
-        <div className="col-md-6 d-flex flex-column" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="row d-flex" style={{ height: "100%" }}>
+        <div
+          className="col-md-6 d-flex flex-column"
+          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
           <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
         </div>
-        <div className="col-md-6 d-flex flex-column" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div
+          className="col-md-6 d-flex flex-column"
+          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
           <UseSpool onUse={handleUseSpool} />
         </div>
       </div>
+      <br />
+      <br />
+      <SpoolList
+        title="Archived Spools"
+        onEdit={handleEditInit}
+        onDelete={handleEditDone}
+        onEditHistory={handleEditHistoryInit}
+        onDeleteHistory={handleDeleteHistory}
+        onSort={onSort}
+        onArchive={onUnArchive}
+        editingHistoryEntry={editingHistoryEntry}
+        setEditingHistoryEntry={setEditingHistoryEntry}
+        handleEditHistorySave={handleEditHistorySave}
+        spools={archivedSpools}
+      />
+      <br />
+      <br />
     </div>
   );
 }
