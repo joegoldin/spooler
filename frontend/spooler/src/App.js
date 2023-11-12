@@ -165,8 +165,14 @@ function App() {
         </>
       )}
       <br />
-      <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
-      <UseSpool onUse={handleUseSpool} />
+      <div className="row">
+        <div className="col-md-6">
+          <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
+        </div>
+        <div className="col-md-6">
+          <UseSpool onUse={handleUseSpool} />
+        </div>
+      </div>
     </div>
   );
 }
