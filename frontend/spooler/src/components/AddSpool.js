@@ -54,7 +54,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
             required
           />
           <button type="submit" className="btn btn-primary">
-            Use
+            Add
           </button>
         </div>
       </form>
