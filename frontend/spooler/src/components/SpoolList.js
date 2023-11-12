@@ -38,8 +38,7 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
               appear={false}
             >
               <li className="list-group-item d-flex justify-content-between align-items-center">
-                [{spool.sort_order}] {spool.name} ({spool.color}) -{" "}
-                {spool.currentWeight}g left
+                {spool.name} ({spool.color}) - {spool.currentWeight}g left
                 <div>
                   <button
                     onClick={() => handleSort(spool, "up")}
