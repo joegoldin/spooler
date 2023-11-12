@@ -1,17 +1,17 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
+const express = require("express");
+const bodyParser = require("body-parser");
+const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = new sqlite3.Database('./filamentDB.sqlite', (err) => {
-    if (err) {
-        console.error(err.message);
-    }
-    console.log('Connected to the SQLite database.');
+const db = new sqlite3.Database("./filamentDB.sqlite", (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log("Connected to the SQLite database.");
 });
 
 db.serialize(() => {
@@ -67,71 +67,130 @@ app.post("/spools", (req, res) => {
   );
 });
 
-
-app.get('/spools', (req, res) => {
-    db.all(`SELECT * FROM spools`, [], (err, rows) => {
-        if (err) {
-            throw err;
-        }
-        res.send(rows);
-    });
+app.get("/spools", (req, res) => {
+  db.all(`SELECT * FROM spools`, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    res.send(rows);
+  });
 });
 
-app.put('/spools/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, color, currentWeight } = req.body;
-    db.run(`UPDATE spools SET name = ?, color = ?, currentWeight = ? WHERE id = ?`,
-    [name, color, currentWeight, id], function(err) {
-        if (err) {
-            return console.error(err.message);
-        }
-        res.send({ message: 'Spool updated', spool: { id, name, color, currentWeight } });
-    });
+app.put("/spools/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, color, currentWeight } = req.body;
+  db.run(
+    `UPDATE spools SET name = ?, color = ?, currentWeight = ? WHERE id = ?`,
+    [name, color, currentWeight, id],
+    function (err) {
+      if (err) {
+        return console.error(err.message);
+      }
+      res.send({
+        message: "Spool updated",
+        spool: { id, name, color, currentWeight },
+      });
+    }
+  );
 });
 
-app.delete('/spools/:id', (req, res) => {
-    const { id } = req.params;
-    db.run(`DELETE FROM spools WHERE id = ?`, id, function(err) {
-        if (err) {
-            return console.error(err.message);
-        }
-        res.send({ message: 'Spool deleted' });
-    });
+app.delete("/spools/:id", (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM spools WHERE id = ?`, id, function (err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.send({ message: "Spool deleted" });
+  });
 });
 
-app.post('/spools/use/:id', (req, res) => {
-    const { id } = req.params;
-    const { weight, note } = req.body;
-    db.get(`SELECT currentWeight FROM spools WHERE id = ?`, id, function(err, row) {
-        if (err) {
-            return console.error(err.message);
-        }
-        if (row.currentWeight < weight) {
-            return res.status(400).send({ message: 'Not enough filament' });
-        }
-        // Start a transaction to ensure both queries are successful
-        db.serialize(() => {
-            db.run(`UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`, [weight, id]);
-            db.run(`INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
-                [id, weight, note || ''], function(err) {
-                    if (err) {
-                        return console.error(err.message);
-                    }
-                    res.send({ message: 'Filament used and history updated', historyId: this.lastID });
-                });
-        });
-    });
+app.post("/spools/use/:id", (req, res) => {
+  const { id } = req.params;
+  const { weight, note } = req.body;
+  db.get(
+    `SELECT currentWeight FROM spools WHERE id = ?`,
+    id,
+    function (err, row) {
+      if (err) {
+        return console.error(err.message);
+      }
+      if (row.currentWeight < weight) {
+        return res.status(400).send({ message: "Not enough filament" });
+      }
+      // Start a transaction to ensure both queries are successful
+      db.serialize(() => {
+        db.run(
+          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
+          [weight, id]
+        );
+        db.run(
+          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+          [id, weight, note || ""],
+          function (err) {
+            if (err) {
+              return console.error(err.message);
+            }
+            res.send({
+              message: "Filament used and history updated",
+              historyId: this.lastID,
+            });
+          }
+        );
+      });
+    }
+  );
 });
 
-app.put('/spools/sort/:id', (req, res) => {
-    const { id } = req.params;
-    const { sortOrder } = req.body;
-    db.run(`UPDATE spools SET sort_order = ? WHERE id = ?`, [sortOrder, id], function(err) {
-        if (err) {
-            return console.error(err.message);
-        }
-        res.send({ message: 'Spool sort order updated' });
-    });
+app.post("/spools/use/top", (req, res) => {
+  const { weight } = req.body;
+  db.get(
+    `SELECT id, currentWeight FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
+    [],
+    function (err, row) {
+      if (err) {
+        return console.error(err.message);
+      }
+      if (row.currentWeight < weight) {
+        return res
+          .status(400)
+          .send({ message: "Not enough filament in the top spool" });
+      }
+      db.serialize(() => {
+        db.run(
+          `UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`,
+          [weight, id]
+        );
+        db.run(
+          `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+          [id, weight, note || ""],
+          function (err) {
+            if (err) {
+              return console.error(err.message);
+            }
+            res.send({
+              message: "Filament used and history updated",
+              historyId: this.lastID,
+            });
+          }
+        );
+      });
+    }
+  );
+});
+
+app.put("/spools/sort/:id", (req, res) => {
+  const { id } = req.params;
+  const { sortOrder } = req.body;
+  db.run(
+    `UPDATE spools SET sort_order = ? WHERE id = ?`,
+    [sortOrder, id],
+    function (err) {
+      if (err) {
+        return console.error(err.message);
+      }
+      res.send({ message: "Spool sort order updated" });
+    }
+  );
 });
 
 app.put("/spools/archive/:id", (req, res) => {
@@ -152,52 +211,63 @@ app.put("/spools/archive/:id", (req, res) => {
 
 // Get usage history for a specific spool
 app.get("/spools/:id/history", (req, res) => {
-    const { id } = req.params;
-    db.all(`SELECT * FROM spool_usage_history WHERE spool_id = ?`, [id], (err, rows) => {
-        if (err) {
-            return res.status(500).send({ message: 'Error fetching spool usage history', error: err.message });
-        }
-        res.send(rows);
-    });
-});
-
-// Add a new usage entry for a spool
-app.post("/spools/:id/use", (req, res) => {
-    const { id } = req.params;
-    const { used_amount, note } = req.body;
-    db.run(`INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
-        [id, used_amount, note], function (err) {
-            if (err) {
-                return res.status(500).send({ message: 'Error adding spool usage entry', error: err.message });
-            }
-            res.status(201).send({ id: this.lastID });
-        }
-    );
+  const { id } = req.params;
+  db.all(
+    `SELECT * FROM spool_usage_history WHERE spool_id = ?`,
+    [id],
+    (err, rows) => {
+      if (err) {
+        return res
+          .status(500)
+          .send({
+            message: "Error fetching spool usage history",
+            error: err.message,
+          });
+      }
+      res.send(rows);
+    }
+  );
 });
 
 // Update a usage entry for a spool
 app.put("/spools/:spoolId/history/:entryId", (req, res) => {
-    const { spoolId, entryId } = req.params;
-    const { used_amount, note } = req.body;
-    db.run(`UPDATE spool_usage_history SET used_amount = ?, note = ? WHERE id = ? AND spool_id = ?`,
-        [used_amount, note, entryId, spoolId], function (err) {
-            if (err) {
-                return res.status(500).send({ message: 'Error updating spool usage entry', error: err.message });
-            }
-            res.send({ message: 'Spool usage entry updated' });
-        }
-    );
+  const { spoolId, entryId } = req.params;
+  const { used_amount, note } = req.body;
+  db.run(
+    `UPDATE spool_usage_history SET used_amount = ?, note = ? WHERE id = ? AND spool_id = ?`,
+    [used_amount, note, entryId, spoolId],
+    function (err) {
+      if (err) {
+        return res
+          .status(500)
+          .send({
+            message: "Error updating spool usage entry",
+            error: err.message,
+          });
+      }
+      res.send({ message: "Spool usage entry updated" });
+    }
+  );
 });
 
 // Delete a usage entry for a spool
 app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
-    const { spoolId, entryId } = req.params;
-    db.run(`DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`, [entryId, spoolId], function (err) {
-        if (err) {
-            return res.status(500).send({ message: 'Error deleting spool usage entry', error: err.message });
-        }
-        res.send({ message: 'Spool usage entry deleted' });
-    });
+  const { spoolId, entryId } = req.params;
+  db.run(
+    `DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`,
+    [entryId, spoolId],
+    function (err) {
+      if (err) {
+        return res
+          .status(500)
+          .send({
+            message: "Error deleting spool usage entry",
+            error: err.message,
+          });
+      }
+      res.send({ message: "Spool usage entry deleted" });
+    }
+  );
 });
 
 app.get("/spools/top", (req, res) => {
@@ -212,8 +282,6 @@ app.get("/spools/top", (req, res) => {
     }
   );
 });
-
-// No changes needed in the REPLACE section since the code is already correct.
 
 const port = 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
