@@ -2,17 +2,28 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
-function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, onDeleteHistory, spools }) {
-
-  const handleEditHistory = (spoolId, historyEntry) => {
-    onEditHistory(spoolId, historyEntry);
-  };
-
+function SpoolList({
+  title,
+  onEdit,
+  onDelete,
+  onSort,
+  onArchive,
+  onEditHistory,
+  onDeleteHistory,
+  spools,
+  handleEditHistorySave,
+  editingHistoryEntry,
+  setEditingHistoryEntry}) {
   const handleDeleteHistory = (spoolId, historyEntryId) => {
     if (window.confirm("Are you sure you want to delete this history entry?")) {
-      fetch(`http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`, { method: "DELETE" })
-        .then(() => onDeleteHistory(spoolId))
-        .catch((error) => console.error("Error deleting history entry:", error));
+      fetch(
+        `http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`,
+        { method: "DELETE" }
+      )
+        .then(() => onDeleteHistory(spoolId, historyEntryId))
+        .catch((error) =>
+          console.error("Error deleting history entry:", error)
+        );
     }
   };
   const handleDelete = (id) => {
@@ -67,21 +78,41 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
                         <tbody>
                           {spool.usage_history.map((historyEntry) => (
                             <tr key={historyEntry.id}>
-                              <td>{new Date(historyEntry.timestamp).toLocaleDateString()} {new Date(historyEntry.timestamp).toLocaleTimeString()}</td>
+                              <td>
+                                {new Date(
+                                  historyEntry.timestamp
+                                ).toLocaleDateString()}{" "}
+                                {new Date(
+                                  historyEntry.timestamp
+                                ).toLocaleTimeString()}
+                              </td>
                               <td>{historyEntry.used_amount}g</td>
                               <td>{historyEntry.note}</td>
                               <td>
-                                {editingHistoryEntry && editingHistoryEntry.id === historyEntry.id ? (
+                                {editingHistoryEntry &&
+                                editingHistoryEntry.id === historyEntry.id ? (
                                   <>
                                     <input
                                       type="number"
                                       value={editingHistoryEntry.used_amount}
-                                      onChange={(e) => setEditingHistoryEntry({ ...editingHistoryEntry, used_amount: e.target.value })}
+                                      onChange={(e) =>
+                                        setEditingHistoryEntry({
+                                          ...editingHistoryEntry,
+                                          used_amount: e.target.value,
+                                        })
+                                      }
                                       className="form-control form-control-sm mx-1"
-                                      style={{ width: 'auto', display: 'inline' }}
+                                      style={{
+                                        width: "auto",
+                                        display: "inline",
+                                      }}
                                     />
                                     <button
-                                      onClick={() => handleEditHistorySave(editingHistoryEntry)}
+                                      onClick={() =>
+                                        handleEditHistorySave(
+                                          editingHistoryEntry
+                                        )
+                                      }
                                       className="btn btn-sm btn-success mx-1"
                                     >
                                       Save
@@ -89,14 +120,21 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
                                   </>
                                 ) : (
                                   <button
-                                    onClick={() => onEditHistory(spool.id, historyEntry)}
+                                    onClick={() =>
+                                      onEditHistory(spool.id, historyEntry)
+                                    }
                                     className="btn btn-sm btn-warning mx-1"
                                   >
                                     Edit
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => handleDeleteHistory(spool.id, historyEntry.id)}
+                                  onClick={() =>
+                                    handleDeleteHistory(
+                                      spool.id,
+                                      historyEntry.id
+                                    )
+                                  }
                                   className="btn btn-sm btn-danger mx-1"
                                 >
                                   Delete
