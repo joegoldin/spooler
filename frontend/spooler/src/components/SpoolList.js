@@ -4,7 +4,10 @@ import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
 const calculateTotalUsed = (historyEntries) => {
   // Ensure historyEntries is an array before calling reduce
-  return (historyEntries || []).reduce((total, entry) => total + parseFloat(entry.used_amount), 0);
+  return (historyEntries || []).reduce(
+    (total, entry) => total + parseFloat(entry.used_amount),
+    0
+  );
 };
 
 function SpoolList({
@@ -18,7 +21,8 @@ function SpoolList({
   spools,
   handleEditHistorySave,
   editingHistoryEntry,
-  setEditingHistoryEntry}) {
+  setEditingHistoryEntry,
+}) {
   const handleDeleteHistory = (spoolId, historyEntryId) => {
     if (window.confirm("Are you sure you want to delete this history entry?")) {
       fetch(
@@ -67,7 +71,13 @@ function SpoolList({
             >
               <li className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
-                  {spool.name} ({spool.color}) - {calculateTotalUsed(spool.usage_history)}g used, {(spool.initial_weight - calculateTotalUsed(spool.usage_history)).toFixed(2)}g remaining
+                  {spool.name} ({spool.color}) -{" "}
+                  {calculateTotalUsed(spool.usage_history)}g used,{" "}
+                  {(
+                    spool.initialWeight -
+                    calculateTotalUsed(spool.usage_history)
+                  ).toFixed(2)}
+                  g remaining
                 </div>
                 <div className="mt-2">
                   {spool.usage_history && spool.usage_history.length > 0 && (
