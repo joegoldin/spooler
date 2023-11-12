@@ -35,13 +35,15 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
               <div>
                 <button
                   onClick={() => handleSort(spool, "up")}
-                  className="btn btn-sm btn-secondary mx-1"
+                  className={`btn btn-sm btn-secondary mx-1 ${spools[0].id === spool.id ? 'disabled' : ''}`}
+                  disabled={spools[0].id === spool.id}
                 >
                   <FaArrowUp />
                 </button>
                 <button
                   onClick={() => handleSort(spool, "down")}
-                  className="btn btn-sm btn-secondary mx-1"
+                  className={`btn btn-sm btn-secondary mx-1 ${spools[spools.length - 1].id === spool.id ? 'disabled' : ''}`}
+                  disabled={spools[spools.length - 1].id === spool.id}
                 >
                   <FaArrowDown />
                 </button>
