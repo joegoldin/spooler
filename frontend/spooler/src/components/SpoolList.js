@@ -43,16 +43,26 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
                 </div>
                 <div className="mt-2">
                   {spool.usage_history && spool.usage_history.length > 0 && (
-                    <>
-                      <strong>Usage History:</strong>
-                      <ul>
-                        {spool.usage_history.map((historyEntry) => (
-                          <li key={historyEntry.id}>
-                            {new Date(historyEntry.timestamp).toLocaleString()}: {historyEntry.used_amount}g - {historyEntry.note}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
+                    <div className="table-responsive">
+                      <table className="table table-sm table-hover mt-2">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Used Amount</th>
+                            <th>Note</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {spool.usage_history.map((historyEntry) => (
+                            <tr key={historyEntry.id}>
+                              <td>{new Date(historyEntry.timestamp).toLocaleDateString()} {new Date(historyEntry.timestamp).toLocaleTimeString()}</td>
+                              <td>{historyEntry.used_amount}g</td>
+                              <td>{historyEntry.note}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   )}
                 </div>
                 <div>
