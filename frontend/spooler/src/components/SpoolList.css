@@ -9,7 +9,10 @@
 }
 .spool-exit {
   opacity: 1;
+  position: absolute; /* Add absolute positioning */
+  width: 100%; /* Ensure the element doesn't collapse */
   transform: translateY(0);
+  transition: opacity 500ms, transform 500ms; /* Add transition for transform */
 }
 .spool-exit-active {
   opacity: 0;
