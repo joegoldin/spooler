@@ -3,7 +3,8 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
 const calculateTotalUsed = (historyEntries) => {
-  return historyEntries.reduce((total, entry) => total + parseFloat(entry.used_amount), 0);
+  // Ensure historyEntries is an array before calling reduce
+  return (historyEntries || []).reduce((total, entry) => total + parseFloat(entry.used_amount), 0);
 };
 
 function SpoolList({
