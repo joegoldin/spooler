@@ -137,7 +137,55 @@ app.put("/spools/archive/:id", (req, res) => {
   );
 });
 
-app.get("/spools/top", (req, res) => {
+// Get usage history for a specific spool
+app.get("/spools/:id/history", (req, res) => {
+    const { id } = req.params;
+    db.all(`SELECT * FROM spool_usage_history WHERE spool_id = ?`, [id], (err, rows) => {
+        if (err) {
+            return res.status(500).send({ message: 'Error fetching spool usage history', error: err.message });
+        }
+        res.send(rows);
+    });
+});
+
+// Add a new usage entry for a spool
+app.post("/spools/:id/use", (req, res) => {
+    const { id } = req.params;
+    const { used_amount, note } = req.body;
+    db.run(`INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+        [id, used_amount, note], function (err) {
+            if (err) {
+                return res.status(500).send({ message: 'Error adding spool usage entry', error: err.message });
+            }
+            res.status(201).send({ id: this.lastID });
+        }
+    );
+});
+
+// Update a usage entry for a spool
+app.put("/spools/:spoolId/history/:entryId", (req, res) => {
+    const { spoolId, entryId } = req.params;
+    const { used_amount, note } = req.body;
+    db.run(`UPDATE spool_usage_history SET used_amount = ?, note = ? WHERE id = ? AND spool_id = ?`,
+        [used_amount, note, entryId, spoolId], function (err) {
+            if (err) {
+                return res.status(500).send({ message: 'Error updating spool usage entry', error: err.message });
+            }
+            res.send({ message: 'Spool usage entry updated' });
+        }
+    );
+});
+
+// Delete a usage entry for a spool
+app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
+    const { spoolId, entryId } = req.params;
+    db.run(`DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`, [entryId, spoolId], function (err) {
+        if (err) {
+            return res.status(500).send({ message: 'Error deleting spool usage entry', error: err.message });
+        }
+        res.send({ message: 'Spool usage entry deleted' });
+    });
+});
   db.get(
     `SELECT * FROM spools WHERE is_archived = 0 ORDER BY sort_order LIMIT 1`,
     [],
