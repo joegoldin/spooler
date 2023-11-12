@@ -101,7 +101,7 @@ app.delete('/spools/:id', (req, res) => {
 
 app.post('/spools/use/:id', (req, res) => {
     const { id } = req.params;
-    const { weight } = req.body;
+    const { weight, note } = req.body;
     db.get(`SELECT currentWeight FROM spools WHERE id = ?`, id, function(err, row) {
         if (err) {
             return console.error(err.message);
@@ -109,11 +109,16 @@ app.post('/spools/use/:id', (req, res) => {
         if (row.currentWeight < weight) {
             return res.status(400).send({ message: 'Not enough filament' });
         }
-        db.run(`UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`, [weight, id], function(err) {
-            if (err) {
-                return console.error(err.message);
-            }
-            res.send({ message: 'Filament used' });
+        // Start a transaction to ensure both queries are successful
+        db.serialize(() => {
+            db.run(`UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`, [weight, id]);
+            db.run(`INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
+                [id, weight, note || ''], function(err) {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    res.send({ message: 'Filament used and history updated', historyId: this.lastID });
+                });
         });
     });
 });
