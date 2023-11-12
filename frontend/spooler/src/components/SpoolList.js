@@ -71,17 +71,17 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
                               <td>{historyEntry.used_amount}g</td>
                               <td>{historyEntry.note}</td>
                               <td>
-                                {editingHistoryEntry && editingHistoryEntry.id === historyEntry.id ? (
+                                {props.editingHistoryEntry && props.editingHistoryEntry.id === historyEntry.id ? (
                                   <>
                                     <input
                                       type="number"
-                                      value={editingHistoryEntry.used_amount}
-                                      onChange={(e) => setEditingHistoryEntry({ ...editingHistoryEntry, used_amount: e.target.value })}
+                                      value={props.editingHistoryEntry.used_amount}
+                                      onChange={(e) => props.setEditingHistoryEntry({ ...props.editingHistoryEntry, used_amount: e.target.value })}
                                       className="form-control form-control-sm mx-1"
                                       style={{ width: 'auto', display: 'inline' }}
                                     />
                                     <button
-                                      onClick={() => handleEditHistorySave(editingHistoryEntry)}
+                                      onClick={() => props.handleEditHistorySave(props.editingHistoryEntry)}
                                       className="btn btn-sm btn-success mx-1"
                                     >
                                       Save
@@ -89,7 +89,7 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
                                   </>
                                 ) : (
                                   <button
-                                    onClick={() => handleEditHistoryInit(spool.id, historyEntry)}
+                                    onClick={() => props.onEditHistory(spool.id, historyEntry)}
                                     className="btn btn-sm btn-warning mx-1"
                                   >
                                     Edit

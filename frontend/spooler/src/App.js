@@ -120,10 +120,13 @@ function App() {
           title="Active Spools"
           onEdit={handleEditInit}
           onDelete={handleEditDone}
-          onEditHistory={handleEditHistory}
+          onEditHistory={handleEditHistoryInit}
           onDeleteHistory={handleDeleteHistory}
           onSort={onSort}
           onArchive={onArchive}
+          editingHistoryEntry={editingHistoryEntry}
+          setEditingHistoryEntry={setEditingHistoryEntry}
+          handleEditHistorySave={handleEditHistorySave}
           spools={spools}
         />
       )}
@@ -133,10 +136,13 @@ function App() {
         title="Archived Spools"
         onEdit={handleEditInit}
         onDelete={handleEditDone}
-        onEditHistory={handleEditHistory}
+        onEditHistory={handleEditHistoryInit}
         onDeleteHistory={handleDeleteHistory}
         onSort={onSort}
         onArchive={onUnArchive}
+        editingHistoryEntry={editingHistoryEntry}
+        setEditingHistoryEntry={setEditingHistoryEntry}
+        handleEditHistorySave={handleEditHistorySave}
         spools={archivedSpools}
       />
     </div>
