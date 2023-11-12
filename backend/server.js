@@ -101,13 +101,32 @@ app.get("/spools", (req, res) => {
 
 app.get("/spools/archived", (req, res) => {
   db.all(
-    `SELECT * FROM  spools WHERE is_archived = 1 ORDER BY sort_order`,
+    `SELECT spools.*, 
+    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history_json
+    FROM spools
+    LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
+    WHERE spools.is_archived = 1
+    GROUP BY spools.id
+    ORDER BY spools.sort_order`,
     [],
     (err, rows) => {
       if (err) {
         throw err;
       }
-      res.send(rows);
+      // Convert the usage_history_json string to an actual JSON array and filter out null entries
+      const rowsWithFilteredHistory = rows.map((row) => {
+        let usageHistory = JSON.parse(row.usage_history_json);
+        // Filter out any entries that are completely null
+        usageHistory = usageHistory.filter((entry) => entry.id !== null);
+        // If after filtering there are no entries, exclude the usage_history property
+        if (usageHistory.length === 0) {
+          const { usage_history_json, ...rest } = row;
+          return rest;
+        }
+        // Otherwise, include the filtered usage_history
+        return { ...row, usage_history: usageHistory };
+      });
+      res.send(rowsWithFilteredHistory);
     }
   );
 });
@@ -178,7 +197,7 @@ app.post("/spools/use/:id", (req, res) => {
         return res.status(400).send({ message: "Not enough filament" });
       }
       let message = "File: " + filePath + ", models: " + note;
-      use_weight(res, weight, message, row.id);
+      use_weight(res, weight, message, id);
     }
   );
 });
@@ -281,21 +300,12 @@ app.put("/spools/:spoolId/history/:entryId", (req, res) => {
       });
     });
   });
-    function (err) {
-      if (err) {
-        return res.status(500).send({
-          message: "Error updating spool usage entry",
-          error: err.message,
-        });
-      }
-      res.send({ message: "Spool usage entry updated" });
-    }
-  );
 });
 
 // Delete a usage entry for a spool
 app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
   const { spoolId, entryId } = req.params;
+  console.log("delete", spoolId, entryId);
   // First, get the used amount for the entry to be deleted
   db.get(`SELECT used_amount FROM spool_usage_history WHERE id = ?`, entryId, function (selectErr, row) {
     if (selectErr) {
@@ -304,8 +314,14 @@ app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
         error: selectErr.message,
       });
     }
+    if (!row) {
+      return res.status(404).send({
+        message: "History entry not found",
+      });
+    }
     // Now, update the currentWeight and delete the history entry
     db.serialize(() => {
+      console.log(row)
       db.run(`UPDATE spools SET currentWeight = currentWeight + ? WHERE id = ?`, [row.used_amount, spoolId]);
       db.run(`DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`, [entryId, spoolId], function (deleteErr) {
         if (deleteErr) {
@@ -318,16 +334,6 @@ app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
       });
     });
   });
-    function (err) {
-      if (err) {
-        return res.status(500).send({
-          message: "Error deleting spool usage entry",
-          error: err.message,
-        });
-      }
-      res.send({ message: "Spool usage entry deleted" });
-    }
-  );
 });
 
 app.get("/spools/top", (req, res) => {

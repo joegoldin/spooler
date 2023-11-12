@@ -63,19 +63,7 @@ function App() {
   };
 
   const handleDeleteHistory = (spoolId, historyEntryId) => {
-    fetch(`http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`, {
-      method: "DELETE",
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(() => {
       fetchSpools();
-    })
-    .catch((error) => console.error('Error deleting history entry:', error));
   };
 
   const onArchive = () => {

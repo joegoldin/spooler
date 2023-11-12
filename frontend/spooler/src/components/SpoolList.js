@@ -184,12 +184,6 @@ function SpoolList({
                     <FaArrowDown />
                   </button>
                   <button
-                    onClick={() => onEdit(spool)}
-                    className="btn btn-sm btn-warning mx-1"
-                  >
-                    Edit
-                  </button>
-                  <button
                     onClick={() => handleDelete(spool.id)}
                     className="btn btn-sm btn-danger mx-1"
                   >
