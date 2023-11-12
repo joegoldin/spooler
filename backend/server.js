@@ -2,17 +2,24 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = new sqlite3.Database("./filamentDB.sqlite", (err) => {
+const dbPath = fs.existsSync("/data/")
+  ? "/data/filamentDB.sqlite"
+  : "./filamentDB.sqlite";
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error(err.message);
+  } else {
+    console.log(`Connected to the SQLite database at ${dbPath}.`);
   }
-  console.log("Connected to the SQLite database.");
 });
+
 
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS spools (
