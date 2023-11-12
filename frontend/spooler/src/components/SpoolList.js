@@ -2,7 +2,19 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
-function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
+function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, onDeleteHistory, spools }) {
+
+  const handleEditHistory = (spoolId, historyEntry) => {
+    onEditHistory(spoolId, historyEntry);
+  };
+
+  const handleDeleteHistory = (spoolId, historyEntryId) => {
+    if (window.confirm("Are you sure you want to delete this history entry?")) {
+      fetch(`http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`, { method: "DELETE" })
+        .then(() => onDeleteHistory(spoolId))
+        .catch((error) => console.error("Error deleting history entry:", error));
+    }
+  };
   const handleDelete = (id) => {
     fetch(`http://localhost:3000/spools/${id}`, { method: "DELETE" })
       .then(() => onDelete())
@@ -58,6 +70,20 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
                               <td>{new Date(historyEntry.timestamp).toLocaleDateString()} {new Date(historyEntry.timestamp).toLocaleTimeString()}</td>
                               <td>{historyEntry.used_amount}g</td>
                               <td>{historyEntry.note}</td>
+                              <td>
+                                <button
+                                  onClick={() => handleEditHistory(spool.id, historyEntry)}
+                                  className="btn btn-sm btn-warning mx-1"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteHistory(spool.id, historyEntry.id)}
+                                  className="btn btn-sm btn-danger mx-1"
+                                >
+                                  Delete
+                                </button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
