@@ -2,7 +2,83 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css"; // Make sure to create this CSS file for animations
 
-function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, onDeleteHistory, spools }) {
+function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
+  const [editingHistoryId, setEditingHistoryId] = useState(null);
+  const [editedHistoryEntry, setEditedHistoryEntry] = useState({ used_amount: '', note: '' });
+
+  const handleEditHistoryClick = (spoolId, historyEntry) => {
+    setEditingHistoryId(historyEntry.id);
+    setEditedHistoryEntry({ used_amount: historyEntry.used_amount, note: historyEntry.note });
+  };
+
+  const handleSaveHistory = (spoolId) => {
+    // Here you would call the API to save the edited history entry
+    // After saving, you would clear the editing state and refresh the spool list
+    console.log('Save history entry:', spoolId, editedHistoryEntry);
+    setEditingHistoryId(null);
+    // Call the API to save the changes, then refresh the spool list
+    // onEditHistory(spoolId, editedHistoryEntry);
+  };
+
+  const handleHistoryInputChange = (field, value) => {
+    setEditedHistoryEntry(prev => ({ ...prev, [field]: value }));
+  };
+
+  // ... rest of the SpoolList component ...
+
+  // Inside the render method, find the part where history entries are rendered
+  // and replace the plain text with input fields when in edit mode
+
+  {spool.usage_history.map((historyEntry) => (
+    <tr key={historyEntry.id}>
+      <td>{new Date(historyEntry.timestamp).toLocaleDateString()} {new Date(historyEntry.timestamp).toLocaleTimeString()}</td>
+      <td>
+        {editingHistoryId === historyEntry.id ? (
+          <input
+            type="number"
+            value={editedHistoryEntry.used_amount}
+            onChange={(e) => handleHistoryInputChange('used_amount', e.target.value)}
+          />
+        ) : (
+          `${historyEntry.used_amount}g`
+        )}
+      </td>
+      <td>
+        {editingHistoryId === historyEntry.id ? (
+          <input
+            type="text"
+            value={editedHistoryEntry.note}
+            onChange={(e) => handleHistoryInputChange('note', e.target.value)}
+          />
+        ) : (
+          historyEntry.note
+        )}
+      </td>
+      <td>
+        {editingHistoryId === historyEntry.id ? (
+          <button
+            onClick={() => handleSaveHistory(spool.id)}
+            className="btn btn-sm btn-success mx-1"
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            onClick={() => handleEditHistoryClick(spool.id, historyEntry)}
+            className="btn btn-sm btn-warning mx-1"
+          >
+            Edit
+          </button>
+        )}
+        <button
+          onClick={() => handleDeleteHistory(spool.id, historyEntry.id)}
+          className="btn btn-sm btn-danger mx-1"
+        >
+          Delete
+        </button>
+      </td>
+    </tr>
+  ))}
 
   const handleEditHistory = (spoolId, historyEntry) => {
     onEditHistory(spoolId, historyEntry);
