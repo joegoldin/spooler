@@ -17,10 +17,12 @@ function AddSpool({ onAdd, onRefreshSpools }) {
   };
 
   return (
-    <div className="card card-body my-4">
+    <div className="card">
+      <div className="card-header">
+        <h2>Add Spool</h2>
+      </div>
       <form onSubmit={handleSubmit}>
-        <h2 className="h4 mb-3">Add Spool</h2>
-        <div className="mb-3">
+        <div className="card-body">
           <input
             type="text"
             className="form-control"
@@ -30,7 +32,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
             required
           />
         </div>
-        <div className="mb-3">
+        <div className="card-body">
           <input
             type="text"
             className="form-control"
@@ -40,7 +42,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
             required
           />
         </div>
-        <div className="mb-3">
+        <div className="card-body">
           <input
             type="number"
             className="form-control"
@@ -51,10 +53,10 @@ function AddSpool({ onAdd, onRefreshSpools }) {
             placeholder="Initial Weight (g)"
             required
           />
+          <button type="submit" className="btn btn-primary">
+            Use
+          </button>
         </div>
-        <button type="submit" className="btn btn-primary">
-          Add Spool
-        </button>
       </form>
     </div>
   );

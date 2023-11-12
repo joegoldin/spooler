@@ -129,24 +129,6 @@ function App() {
   return (
     <div className="container mt-5">
       <h1 className="text-center mb-4">Filament Tracker</h1>
-      {editingSpool ? (
-        <EditSpool spool={editingSpool} onEdit={handleEditDone} />
-      ) : (
-        <SpoolList
-          title="Active Spools"
-          onEdit={handleEditInit}
-          onDelete={handleEditDone}
-          onEditHistory={handleEditHistoryInit}
-          onDeleteHistory={handleDeleteHistory}
-          onSort={onSort}
-          onArchive={onArchive}
-          editingHistoryEntry={editingHistoryEntry}
-          setEditingHistoryEntry={setEditingHistoryEntry}
-          handleEditHistorySave={handleEditHistorySave}
-          spools={spools}
-        />
-      )}
-      <br />
       <br />
       {editingSpool ? (
         <EditSpool spool={editingSpool} onEdit={handleEditDone} />
