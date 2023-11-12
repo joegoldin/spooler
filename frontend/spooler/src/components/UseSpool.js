@@ -7,8 +7,7 @@ function UseSpool({ onUse }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const combinedNote = `Note: ${note}, Models: ${model}`;
-    onUse(weight, combinedNote); // Send the combined note to the onUse function
+    onUse(weight, note, model); // Send the combined note to the onUse function
     setWeight('');
     setNote('');
     setModel(''); // Reset the model state after submitting
@@ -44,13 +43,13 @@ function UseSpool({ onUse }) {
             />
           </div>
           <div className="form-group">
-            <label>Note:</label>
+            <label>File:</label>
             <input
               type="text"
               className="form-control"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Note"
+              placeholder="Filename"
             />
           </div>
           <button type="submit" className="btn btn-primary">Use</button>
