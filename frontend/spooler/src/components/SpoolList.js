@@ -67,7 +67,7 @@ function SpoolList({
             >
               <li className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
-                  {spool.name} ({spool.color}) - {calculateTotalUsed(spool.usage_history)}g used, {spool.initial_weight - calculateTotalUsed(spool.usage_history)}g remaining
+                  {spool.name} ({spool.color}) - {calculateTotalUsed(spool.usage_history)}g used, {(spool.initial_weight - calculateTotalUsed(spool.usage_history)).toFixed(2)}g remaining
                 </div>
                 <div className="mt-2">
                   {spool.usage_history && spool.usage_history.length > 0 && (
