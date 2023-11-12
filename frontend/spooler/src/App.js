@@ -39,11 +39,24 @@ function App() {
     setEditingHistoryEntry({ spoolId, ...historyEntry });
   };
 
-  const handleUseSpool = (weight, note) => {
-    // TODO: Implement the logic to send the "use spool" data to the backend
-    console.log('Using spool with weight:', weight, 'and note:', note);
-    // After successful backend update, refresh the spools list
-    fetchSpools();
+  const handleUseSpool = (weight, combinedNote) => {
+    // Assuming the top spool is the one being used
+    fetch("http://localhost:3000/spools/use/top", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ weight, note: combinedNote }),
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(() => {
+      // After successful backend update, refresh the spools list
+      fetchSpools();
+    })
+    .catch((error) => console.error('Error using spool:', error));
   };
 
   const handleEditHistorySave = (historyEntry) => {
