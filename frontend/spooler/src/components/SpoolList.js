@@ -25,7 +25,7 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
     <div>
       <h2 className="h4 mb-3">Filament Spools</h2>
       <ul className="list-group">
-        {spools
+        {spools.sort((a, b) => b.sort_order - a.sort_order)
           .map((spool) => (
             <li
               key={spool.sort_order}
