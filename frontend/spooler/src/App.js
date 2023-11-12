@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SpoolList from "./components/SpoolList";
 import AddSpool from "./components/AddSpool";
 import EditSpool from "./components/EditSpool";
+import UseSpool from "./components/UseSpool";
 import "bootstrap/dist/css/bootstrap.min.css"; // Make sure to import Bootstrap CSS
 
 function App() {
@@ -36,6 +37,13 @@ function App() {
 
   const handleEditHistoryInit = (spoolId, historyEntry) => {
     setEditingHistoryEntry({ spoolId, ...historyEntry });
+  };
+
+  const handleUseSpool = (weight, note) => {
+    // TODO: Implement the logic to send the "use spool" data to the backend
+    console.log('Using spool with weight:', weight, 'and note:', note);
+    // After successful backend update, refresh the spools list
+    fetchSpools();
   };
 
   const handleEditHistorySave = (historyEntry) => {
@@ -121,8 +129,6 @@ function App() {
   return (
     <div className="container mt-5">
       <h1 className="text-center mb-4">Filament Tracker</h1>
-      <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
-      <br />
       {editingSpool ? (
         <EditSpool spool={editingSpool} onEdit={handleEditDone} />
       ) : (
@@ -142,19 +148,43 @@ function App() {
       )}
       <br />
       <br />
-      <SpoolList
-        title="Archived Spools"
-        onEdit={handleEditInit}
-        onDelete={handleEditDone}
-        onEditHistory={handleEditHistoryInit}
-        onDeleteHistory={handleDeleteHistory}
-        onSort={onSort}
-        onArchive={onUnArchive}
-        editingHistoryEntry={editingHistoryEntry}
-        setEditingHistoryEntry={setEditingHistoryEntry}
-        handleEditHistorySave={handleEditHistorySave}
-        spools={archivedSpools}
-      />
+      {editingSpool ? (
+        <EditSpool spool={editingSpool} onEdit={handleEditDone} />
+      ) : (
+        <>
+          <SpoolList
+            title="Active Spools"
+            onEdit={handleEditInit}
+            onDelete={handleEditDone}
+            onEditHistory={handleEditHistoryInit}
+            onDeleteHistory={handleDeleteHistory}
+            onSort={onSort}
+            onArchive={onArchive}
+            editingHistoryEntry={editingHistoryEntry}
+            setEditingHistoryEntry={setEditingHistoryEntry}
+            handleEditHistorySave={handleEditHistorySave}
+            spools={spools}
+          />
+          <br />
+          <br />
+          <SpoolList
+            title="Archived Spools"
+            onEdit={handleEditInit}
+            onDelete={handleEditDone}
+            onEditHistory={handleEditHistoryInit}
+            onDeleteHistory={handleDeleteHistory}
+            onSort={onSort}
+            onArchive={onUnArchive}
+            editingHistoryEntry={editingHistoryEntry}
+            setEditingHistoryEntry={setEditingHistoryEntry}
+            handleEditHistorySave={handleEditHistorySave}
+            spools={archivedSpools}
+          />
+        </>
+      )}
+      <br />
+      <AddSpool onAdd={fetchSpools} onRefreshSpools={fetchSpools} />
+      <UseSpool onUse={handleUseSpool} />
     </div>
   );
 }
