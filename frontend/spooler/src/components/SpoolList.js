@@ -3,7 +3,7 @@ import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./SpoolList.css";
 
-function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, onDeleteHistory, spools }) {
+function SpoolList({ title, onEdit, onDelete, onSort, onArchive, spools }) {
   const [editingHistoryId, setEditingHistoryId] = useState(null);
   const [editedHistoryEntry, setEditedHistoryEntry] = useState({ used_amount: '', note: '' });
 
@@ -29,8 +29,7 @@ function SpoolList({ title, onEdit, onDelete, onSort, onArchive, onEditHistory, 
   // Inside the render method, find the part where history entries are rendered
   // and replace the plain text with input fields when in edit mode
 
-  {spools.map((spool) => (
-    spool.usage_history.map((historyEntry) => (
+  {spool.usage_history.map((historyEntry) => (
     <tr key={historyEntry.id}>
       <td>{new Date(historyEntry.timestamp).toLocaleDateString()} {new Date(historyEntry.timestamp).toLocaleTimeString()}</td>
       <td>
