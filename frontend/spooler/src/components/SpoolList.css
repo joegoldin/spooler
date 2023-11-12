@@ -9,13 +9,15 @@
 }
 .spool-exit {
   opacity: 1;
-  position: absolute; /* Add absolute positioning */
-  width: 100%; /* Ensure the element doesn't collapse */
+  position: absolute; /* Absolute positioning to take the element out of flow */
+  width: 100%; /* Maintain the element's width */
+  top: 0; /* Align to the top of the parent */
+  left: 0; /* Align to the left of the parent */
   transform: translateY(0);
-  transition: opacity 500ms, transform 500ms; /* Add transition for transform */
+  transition: opacity 500ms, transform 500ms; /* Transition for opacity and transform */
 }
 .spool-exit-active {
   opacity: 0;
   transform: translateY(-100%); /* Move the exiting element up by its own height */
-  transition: opacity 500ms, transform 500ms;
+  transition: opacity 500ms, transform 500ms; /* Ensure transitions apply for both properties */
 }
