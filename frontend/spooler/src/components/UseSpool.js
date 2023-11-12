@@ -12,7 +12,7 @@ function UseSpool({ onUse }) {
   };
 
   return (
-    <div className="card">
+    <div className="card flex-grow-1">
       <div className="card-header">
         <h2>Use Spool</h2>
       </div>
