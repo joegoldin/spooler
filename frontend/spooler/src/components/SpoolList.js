@@ -28,7 +28,7 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
         {spools.sort((a, b) => b.sort_order - a.sort_order)
           .map((spool) => (
             <li
-              key={spool.sort_order}
+              key={spool.id}
               className="list-group-item d-flex justify-content-between align-items-center"
             >
               [{spool.sort_order}] {spool.name} ({spool.color}) - {spool.currentWeight}g left
