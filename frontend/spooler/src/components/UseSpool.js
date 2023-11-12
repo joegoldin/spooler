@@ -3,10 +3,15 @@ import React, { useState } from 'react';
 function UseSpool({ onUse }) {
   const [weight, setWeight] = useState('');
   const [note, setNote] = useState('');
+  const [model, setModel] = useState(''); // New state variable for the model input
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUse(weight, note);
+    const combinedNote = `Note: ${note}, Models: ${model}`;
+    onUse(weight, combinedNote); // Send the combined note to the onUse function
+    setWeight('');
+    setNote('');
+    setModel(''); // Reset the model state after submitting
     setWeight('');
     setNote('');
   };
@@ -29,12 +34,23 @@ function UseSpool({ onUse }) {
             />
           </div>
           <div className="form-group">
+            <label>Model:</label>
+            <input
+              type="text"
+              className="form-control"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="Model"
+            />
+          </div>
+          <div className="form-group">
             <label>Note:</label>
             <input
               type="text"
               className="form-control"
               value={note}
               onChange={(e) => setNote(e.target.value)}
+              placeholder="Note"
             />
           </div>
           <button type="submit" className="btn btn-primary">Use</button>
