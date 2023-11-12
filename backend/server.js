@@ -185,10 +185,8 @@ app.post("/spools/use/:id", (req, res) => {
 
 function use_weight(res, weight, note, id) {
   db.serialize(() => {
-    db.run(`UPDATE spools SET currentWeight = currentWeight - ? WHERE id = ?`, [
-      weight,
-      id,
-    ]);
+    const newWeight = `currentWeight - ${weight}`;
+    db.run(`UPDATE spools SET currentWeight = ${newWeight} WHERE id = ?`, id);
     db.run(
       `INSERT INTO spool_usage_history (spool_id, used_amount, note) VALUES (?, ?, ?)`,
       [id, weight, note || ""],
@@ -259,9 +257,30 @@ app.get("/spools/:id/history", (req, res) => {
 app.put("/spools/:spoolId/history/:entryId", (req, res) => {
   const { spoolId, entryId } = req.params;
   const { used_amount, note } = req.body;
-  db.run(
-    `UPDATE spool_usage_history SET used_amount = ?, note = ? WHERE id = ? AND spool_id = ?`,
-    [used_amount, note, entryId, spoolId],
+  // First, get the old used amount for the entry
+  db.get(`SELECT used_amount FROM spool_usage_history WHERE id = ?`, entryId, function (selectErr, row) {
+    if (selectErr) {
+      return res.status(500).send({
+        message: "Error retrieving history entry",
+        error: selectErr.message,
+      });
+    }
+    // Calculate the weight difference
+    const weightDifference = row.used_amount - used_amount;
+    // Now, update the currentWeight and the history entry
+    db.serialize(() => {
+      db.run(`UPDATE spools SET currentWeight = currentWeight + ? WHERE id = ?`, [weightDifference, spoolId]);
+      db.run(`UPDATE spool_usage_history SET used_amount = ?, note = ? WHERE id = ? AND spool_id = ?`, [used_amount, note, entryId, spoolId], function (updateErr) {
+        if (updateErr) {
+          return res.status(500).send({
+            message: "Error updating spool usage entry",
+            error: updateErr.message,
+          });
+        }
+        res.send({ message: "Spool usage entry updated" });
+      });
+    });
+  });
     function (err) {
       if (err) {
         return res.status(500).send({
@@ -277,9 +296,28 @@ app.put("/spools/:spoolId/history/:entryId", (req, res) => {
 // Delete a usage entry for a spool
 app.delete("/spools/:spoolId/history/:entryId", (req, res) => {
   const { spoolId, entryId } = req.params;
-  db.run(
-    `DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`,
-    [entryId, spoolId],
+  // First, get the used amount for the entry to be deleted
+  db.get(`SELECT used_amount FROM spool_usage_history WHERE id = ?`, entryId, function (selectErr, row) {
+    if (selectErr) {
+      return res.status(500).send({
+        message: "Error retrieving history entry",
+        error: selectErr.message,
+      });
+    }
+    // Now, update the currentWeight and delete the history entry
+    db.serialize(() => {
+      db.run(`UPDATE spools SET currentWeight = currentWeight + ? WHERE id = ?`, [row.used_amount, spoolId]);
+      db.run(`DELETE FROM spool_usage_history WHERE id = ? AND spool_id = ?`, [entryId, spoolId], function (deleteErr) {
+        if (deleteErr) {
+          return res.status(500).send({
+            message: "Error deleting spool usage entry",
+            error: deleteErr.message,
+          });
+        }
+        res.send({ message: "Spool usage entry deleted" });
+      });
+    });
+  });
     function (err) {
       if (err) {
         return res.status(500).send({
