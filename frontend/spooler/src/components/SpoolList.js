@@ -1,4 +1,6 @@
 import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import './SpoolList.css'; // Make sure to create this CSS file for animations
 
 function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
   const handleDelete = (id) => {
@@ -24,13 +26,13 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
   return (
     <div>
       <h2 className="h4 mb-3">Filament Spools</h2>
-      <ul className="list-group">
+      <TransitionGroup component="ul" className="list-group">
         {spools.sort((a, b) => a.sort_order - b.sort_order)
           .map((spool) => (
-            <li
-              key={spool.id}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
+            <CSSTransition key={spool.id} timeout={500} classNames="spool">
+              <li
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
               [{spool.sort_order}] {spool.name} ({spool.color}) - {spool.currentWeight}g left
               <div>
                 <button
@@ -66,9 +68,10 @@ function SpoolList({ onEdit, onDelete, onSort, onArchive, spools }) {
                   <FaArchive />
                 </button>
               </div>
-            </li>
+              </li>
+            </CSSTransition>
           ))}
-      </ul>
+      </TransitionGroup>
     </div>
   );
 }
