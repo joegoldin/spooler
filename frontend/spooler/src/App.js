@@ -62,12 +62,20 @@ function App() {
     .catch((error) => console.error('Error saving edited history entry:', error));
   };
 
-  const handleDeleteHistory = (spoolId) => {
-    // Logic for handling history deletion will go here
-    // This will likely involve an API call to delete the history entry
-    // and then a re-fetch of the spool data
-    console.log('Delete history entry for spool:', spoolId);
-    fetchSpools();
+  const handleDeleteHistory = (spoolId, historyEntryId) => {
+    fetch(`http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`, {
+      method: "DELETE",
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(() => {
+      fetchSpools();
+    })
+    .catch((error) => console.error('Error deleting history entry:', error));
   };
 
   const onArchive = () => {
