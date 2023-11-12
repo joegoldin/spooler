@@ -1,0 +1,99 @@
+/* Add this to your main CSS file */
+
+/* Basic Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background: #f4f4f4;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    overflow: auto;
+    padding: 0 20px;
+}
+
+h1, h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="number"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    display: inline-block;
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #555;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+    background: #e2e2e2;
+    color: #333;
+}
+
+/* Custom styles for edit/delete buttons */
+.edit-btn,
+.delete-btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.edit-btn {
+    background-color: #ffca28; /* amber */
+}
+
+.delete-btn {
+    background-color: #f44336; /* red */
+}
+
+.edit-btn:hover {
+    background-color: #ffc107; /* amber darken */
+}
+
+.delete-btn:hover {
+    background-color: #e53935; /* red darken */
+}
