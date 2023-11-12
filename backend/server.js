@@ -70,7 +70,7 @@ app.post("/spools", (req, res) => {
 app.get("/spools", (req, res) => {
   db.all(
     `SELECT spools.*, 
-    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history
+    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history_json
     FROM spools
     LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
     WHERE spools.is_archived = 0
@@ -81,7 +81,12 @@ app.get("/spools", (req, res) => {
       if (err) {
         throw err;
       }
-      res.send(rows);
+      // Convert the usage_history_json string to an actual JSON array
+      const rowsWithParsedHistory = rows.map(row => ({
+        ...row,
+        usage_history: JSON.parse(row.usage_history_json)
+      }));
+      res.send(rowsWithParsedHistory);
     }
   );
 });
