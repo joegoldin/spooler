@@ -1,5 +1,5 @@
 # Spooler
-[![Docker](https://img.shields.io/docker/image-size/joegoldin/spooler/latest)](https://hub.docker.com/r/joegoldin/spooler)
+[![Docker](https://img.shields.io/badge/docker_image-latest-blue?logo=docker)](https://hub.docker.com/r/joegoldin/spooler) [![Docker](https://img.shields.io/docker/image-size/joegoldin/spooler/latest?logo=docker)](https://hub.docker.com/r/joegoldin/spooler)
 
 Spooler is a web application for logging 3D printing usage. It exposes an API for integration with slicer software for automatic tracking.
 
