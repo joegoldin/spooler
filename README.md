@@ -1,9 +1,9 @@
 # Spooler
 [![Docker](https://img.shields.io/docker/image-size/joegoldin/spooler/latest)](https://hub.docker.com/r/joegoldin/spooler)
 
-Spooler is a web application for tracking 3D printing usage, featuring an API that can be interacted with from slicers on post-processing for automatic filament tracking.
+Spooler is a web application for logging 3D printing usage. It exposes an API for integration with slicer software for automatic tracking.
 
-Heavily inspired by [Spoolman](https://github.com/Donkie/Spoolman), but with a log of each filament spool's usage, rather than just the total usage.
+Heavily inspired by [Spoolman](https://github.com/Donkie/Spoolman), but with a log of each spool's usage, rather than just total usage to date.
 
 ###### Warning: This project was built using heavy use of generative LLMs, use at your own risk. 🤙
 
