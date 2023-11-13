@@ -22,6 +22,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
         <h2>Add Spool</h2>
       </div>
       <form onSubmit={handleSubmit}>
+        <label>Name:</label>
         <div className="card-body">
           <input
             type="text"
@@ -33,6 +34,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
           />
         </div>
         <div className="card-body">
+          <label>Color:</label>
           <input
             type="text"
             className="form-control"
@@ -43,6 +45,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
           />
         </div>
         <div className="card-body">
+          <label>Initial Weight (g):</label>
           <input
             type="number"
             className="form-control"
