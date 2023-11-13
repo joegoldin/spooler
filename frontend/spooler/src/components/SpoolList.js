@@ -1,6 +1,6 @@
 import { FaArrowUp, FaArrowDown, FaArchive } from "react-icons/fa";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import "./SpoolList.css"; // Make sure to create this CSS file for animations
+import "./SpoolList.css";
 
 const calculateTotalUsed = (historyEntries) => {
   // Ensure historyEntries is an array before calling reduce
@@ -75,7 +75,7 @@ function SpoolList({
               <li className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
                   {spool.name} ({spool.color}) -{" "}
-                  {calculateTotalUsed(spool.usage_history)}g used,{" "}
+                  {calculateTotalUsed(spool.usage_history).toFixed(2)}g used,{" "}
                   {(
                     spool.initialWeight -
                     calculateTotalUsed(spool.usage_history)
@@ -89,8 +89,8 @@ function SpoolList({
                         <thead>
                           <tr>
                             <th>Date</th>
-                            <th>Used Amount</th>
-                            <th>Note</th>
+                            <th>Used</th>
+                            <th>Details</th>
                           </tr>
                         </thead>
                         <tbody>

@@ -22,8 +22,8 @@ function AddSpool({ onAdd, onRefreshSpools }) {
         <h2>Add Spool</h2>
       </div>
       <form onSubmit={handleSubmit}>
-        <label>Name:</label>
         <div className="card-body">
+          <label>Name:</label>
           <input
             type="text"
             className="form-control"
@@ -32,30 +32,30 @@ function AddSpool({ onAdd, onRefreshSpools }) {
             placeholder="Name"
             required
           />
-        </div>
-        <div className="card-body">
-          <label>Color:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={spool.color}
-            onChange={(e) => setSpool({ ...spool, color: e.target.value })}
-            placeholder="Color"
-            required
-          />
-        </div>
-        <div className="card-body">
-          <label>Initial Weight (g):</label>
-          <input
-            type="number"
-            className="form-control"
-            value={spool.initialWeight}
-            onChange={(e) =>
-              setSpool({ ...spool, initialWeight: e.target.value })
-            }
-            placeholder="Initial Weight (g)"
-            required
-          />
+          <div className="form-group">
+            <label>Color:</label>
+            <input
+              type="text"
+              className="form-control"
+              value={spool.color}
+              onChange={(e) => setSpool({ ...spool, color: e.target.value })}
+              placeholder="Color"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Initial Weight (g):</label>
+            <input
+              type="number"
+              className="form-control"
+              value={spool.initialWeight}
+              onChange={(e) =>
+                setSpool({ ...spool, initialWeight: e.target.value })
+              }
+              placeholder="Initial Weight (g)"
+              required
+            />
+          </div>
           <button type="submit" className="btn btn-primary">
             Add
           </button>

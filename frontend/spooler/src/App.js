@@ -3,7 +3,7 @@ import SpoolList from "./components/SpoolList";
 import AddSpool from "./components/AddSpool";
 import EditSpool from "./components/EditSpool";
 import UseSpool from "./components/UseSpool";
-import "bootstrap/dist/css/bootstrap.min.css"; // Make sure to import Bootstrap CSS
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [spools, setSpools] = useState([]);
@@ -53,7 +53,6 @@ function App() {
         return response.json();
       })
       .then(() => {
-        // After successful backend update, refresh the spools list
         fetchSpools();
       })
       .catch((error) => console.error("Error using spool:", error));
@@ -104,7 +103,6 @@ function App() {
   const onSort = (spools, spoolId, direction) => {
     // Find the index of the spool we're moving
     const index = spools.findIndex((s) => s.id === spoolId);
-    // if (index === -1) return; // Spool not found
 
     let swapIndex = direction === "up" ? index - 1 : index + 1;
     if (swapIndex >= 0 && swapIndex < spools.length) {
@@ -188,7 +186,7 @@ function App() {
           className="col-md-6 d-flex flex-column"
           style={{ display: "flex", flexDirection: "column", height: "100%" }}
         >
-          <UseSpool onUse={handleUseSpool} />
+          <UseSpool onUse={handleUseSpool} spools={spools} />
         </div>
       </div>
       <br />

@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 
-function UseSpool({ onUse }) {
-  const [weight, setWeight] = useState('');
-  const [note, setNote] = useState('');
-  const [model, setModel] = useState(''); // New state variable for the model input
+function UseSpool({ onUse, spools }) {
+  const [weight, setWeight] = useState("");
+  const [note, setNote] = useState("");
+  const [model, setModel] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUse(weight, note, model); // Send the combined note to the onUse function
-    setWeight('');
-    setNote('');
-    setModel(''); // Reset the model state after submitting
-    setWeight('');
-    setNote('');
+    onUse(weight, note, model);
+    setWeight("");
+    setNote("");
+    setModel("");
+    setWeight("");
+    setNote("");
   };
 
+  let spoolName = spools && spools[0] && spools[0].name ? spools[0].name : "";
+
   return (
-    <div className="card flex-grow-1">
+    <div className="card">
       <div className="card-header">
-        <h2>Use Spool</h2>
+        <h2>Use Spool: {spoolName}</h2>
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -52,7 +54,9 @@ function UseSpool({ onUse }) {
               placeholder="Filename"
             />
           </div>
-          <button type="submit" className="btn btn-primary">Use</button>
+          <button type="submit" className="btn btn-primary">
+            Use
+          </button>
         </form>
       </div>
     </div>

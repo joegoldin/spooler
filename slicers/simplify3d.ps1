@@ -3,7 +3,7 @@ param(
     [string]$filePath
 )
 
-$SERVER="http://localhost:3000"
+$SERVER = "http://192.168.1.183:3070"
 
 $matchedWeight = (Get-Content "$filePath" | Select-String -Pattern '^.*Material Weight:\s+(\d+\.\d+).*g.*$').Matches.Groups[1].Value
 $matchedNote = (Get-Content "$filePath" | Select-String -Pattern '^.*targetModels,(.+)$').Matches.Groups[1].Value
