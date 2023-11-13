@@ -10,10 +10,9 @@ RUN npm install --prefix backend
 
 # Copy the frontend application
 COPY . .
-RUN npm install --prefix frontend/spooler
-RUN npm run build --prefix frontend/spooler
 
-# Bundle app source
+# Install dependencies for frontend
+RUN npm install --prefix frontend/spooler
 
 # Expose ports for backend and frontend
 EXPOSE 3000 3001

@@ -12,11 +12,11 @@ function App() {
   const [editingHistoryEntry, setEditingHistoryEntry] = useState(null);
 
   const fetchSpools = () => {
-    fetch("http://localhost:3000/spools")
+    fetch(process.env.REACT_APP_SERVER_URI + "/spools")
       .then((response) => response.json())
       .then((data) => setSpools(data))
       .catch((error) => console.error("Error fetching data:", error));
-    fetch("http://localhost:3000/spools/archived")
+    fetch(process.env.REACT_APP_SERVER_URI + "/spools/archived")
       .then((response) => response.json())
       .then((data) => setArchivedSpools(data))
       .catch((error) => console.error("Error fetching data:", error));
@@ -41,7 +41,7 @@ function App() {
 
   const handleUseSpool = (weight, note, filePath) => {
     // Assuming the top spool is the one being used
-    fetch("http://localhost:3000/spools/use/top", {
+    fetch(process.env.REACT_APP_SERVER_URI + "/spools/use/top", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ weight, note, filePath }),
@@ -60,31 +60,37 @@ function App() {
   };
 
   const handleEditHistorySave = (historyEntry) => {
-    fetch(`http://localhost:3000/spools/${historyEntry.spoolId}/history/${historyEntry.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        used_amount: historyEntry.used_amount,
-        note: historyEntry.note,
-      }),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+    fetch(
+      process.env.REACT_APP_SERVER_URI +
+        `/spools/${historyEntry.spoolId}/history/${historyEntry.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          used_amount: historyEntry.used_amount,
+          note: historyEntry.note,
+        }),
       }
-      return response.json();
-    })
-    .then(() => {
-      setEditingHistoryEntry(null);
-      fetchSpools();
-    })
-    .catch((error) => console.error('Error saving edited history entry:', error));
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(() => {
+        setEditingHistoryEntry(null);
+        fetchSpools();
+      })
+      .catch((error) =>
+        console.error("Error saving edited history entry:", error)
+      );
   };
 
   const handleDeleteHistory = (spoolId, historyEntryId) => {
-      fetchSpools();
+    fetchSpools();
   };
 
   const onArchive = () => {
@@ -117,20 +123,27 @@ function App() {
 
     // Now, we'll need to update the backend with both changes
     Promise.all([
-      fetch(`http://localhost:3000/spools/sort/${spools[index].id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sortOrder: spools[index].sort_order }),
-      }),
-      fetch(`http://localhost:3000/spools/sort/${spools[swapIndex].id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sortOrder: spools[swapIndex].sort_order }),
-      }),
+      fetch(
+        process.env.REACT_APP_SERVER_URI + `/spools/sort/${spools[index].id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sortOrder: spools[index].sort_order }),
+        }
+      ),
+      fetch(
+        process.env.REACT_APP_SERVER_URI +
+          `/spools/sort/${spools[swapIndex].id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sortOrder: spools[swapIndex].sort_order }),
+        }
+      ),
     ])
       .then((responses) => Promise.all(responses.map((res) => res.json())))
       .then((data) => console.log("Sort orders updated:", data))

@@ -26,7 +26,8 @@ function SpoolList({
   const handleDeleteHistory = (spoolId, historyEntryId) => {
     if (window.confirm("Are you sure you want to delete this history entry?")) {
       fetch(
-        `http://localhost:3000/spools/${spoolId}/history/${historyEntryId}`,
+        process.env.REACT_APP_SERVER_URI +
+          `/spools/${spoolId}/history/${historyEntryId}`,
         { method: "DELETE" }
       )
         .then(() => onDeleteHistory(spoolId, historyEntryId))
@@ -36,7 +37,9 @@ function SpoolList({
     }
   };
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/spools/${id}`, { method: "DELETE" })
+    fetch(process.env.REACT_APP_SERVER_URI + `/spools/${id}`, {
+      method: "DELETE",
+    })
       .then(() => onDelete())
       .catch((error) => console.error("Error deleting spool:", error));
   };
@@ -47,7 +50,7 @@ function SpoolList({
 
   const handleArchive = (id, archived) => {
     console.log("handleArchive", id, archived);
-    fetch(`http://localhost:3000/spools/archive/${id}`, {
+    fetch(process.env.REACT_APP_SERVER_URI + `/spools/archive/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isArchived: archived }),

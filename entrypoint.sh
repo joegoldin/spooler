@@ -3,10 +3,8 @@
 # Start the backend server in the background
 node backend/server.js &
 
-# Serve the frontend build
-# Assuming the build is served using a static server on port 3001
-# You can use any static server of your choice
-yes | npx serve -s frontend/spooler/build -l 3001
+# Run the frontend (we run the dev build to ensure env vars are up to date)
+cd frontend/spooler && npm start
 
 # Keep the container running
 wait

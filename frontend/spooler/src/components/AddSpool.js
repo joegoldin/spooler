@@ -5,7 +5,7 @@ function AddSpool({ onAdd, onRefreshSpools }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/spools", {
+    fetch(process.env.REACT_APP_SERVER_URI + "/spools", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(spool),
