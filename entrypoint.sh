@@ -4,7 +4,7 @@
 node backend/server.js &
 
 # Run the frontend (we run the dev build to ensure env vars are up to date)
-cd frontend/spooler && npm start
+cd frontend && npm start
 
 # Keep the container running
 wait

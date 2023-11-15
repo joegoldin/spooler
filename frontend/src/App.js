@@ -152,7 +152,19 @@ function App() {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center mb-4">Filament Tracker</h1>
+      <div className="text-center mb-4">
+        <img
+          src="/logo.png"
+          alt="Spooler Logo"
+          style={{
+            height: "8em",
+            verticalAlign: "middle",
+          }}
+        />
+        <h1 className="mb-4" style={{ verticalAlign: "middle" }}>
+          Spooler
+        </h1>
+      </div>
       <br />
       {editingSpool ? (
         <EditSpool spool={editingSpool} onEdit={handleEditDone} />

@@ -12,7 +12,7 @@ RUN npm install --prefix backend
 COPY . .
 
 # Install dependencies for frontend
-RUN npm install --prefix frontend/spooler
+RUN npm install --prefix frontend
 
 # Expose ports for backend and frontend
 EXPOSE 3000 3001

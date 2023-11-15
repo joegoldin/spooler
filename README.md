@@ -1,3 +1,5 @@
+<center><img src="frontend/public/logo.png" alt="Spooler Logo" width="350"/></center>
+
 # Spooler
 [![Docker](https://img.shields.io/badge/docker_image-latest-blue?logo=docker)](https://hub.docker.com/r/joegoldin/spooler) [![Docker](https://img.shields.io/docker/image-size/joegoldin/spooler/latest?logo=docker)](https://hub.docker.com/r/joegoldin/spooler)
 
