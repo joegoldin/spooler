@@ -1,0 +1,338 @@
+openapi: 3.0.0
+info:
+  title: Filament Tracker API
+  description: API to manage filament spools for 3D printers
+  version: "1.0"
+servers:
+  - url: http://localhost:3000
+    description: Local server
+paths:
+  /spools:
+    get:
+      summary: Get a list of all non-archived spools with their usage history
+      responses:
+        '200':
+          description: A list of spools successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/SpoolWithHistory'
+    post:
+      summary: Add a new spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSpoolRequest'
+      responses:
+        '201':
+          description: Spool created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewSpoolResponse'
+  /spools/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The unique identifier of the spool
+        schema:
+          type: integer
+    get:
+      summary: Get details for a specific spool including usage history
+      responses:
+        '200':
+          description: Spool details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpoolWithHistory'
+        '404':
+          description: Spool not found 
+    put:
+      summary: Update details for a specific spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpoolRequest'
+      responses:
+        '200':
+          description: Spool updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSpoolResponse'
+    delete:
+      summary: Delete a specific spool
+      responses:
+        '200':
+          description: Spool deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /spools/use/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The unique identifier of the spool to use
+        schema:
+          type: integer
+    post:
+      summary: Record usage of filament for a specific spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UseSpoolRequest'
+      responses:
+        '200':
+          description: Filament usage recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UseSpoolResponse'
+        '400':
+          description: Not enough filament 
+  /spools/use/top:
+    post:
+      summary: Record usage of filament for the top spool in sort order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UseSpoolRequest'
+      responses:
+        '200':
+          description: Filament usage recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UseSpoolResponse'
+        '400':
+          description: Not enough filament in the top spool 
+  /spools/top:
+    get:
+      summary: Get details of the top spool in sort order
+      responses:
+        '200':
+          description: Top spool details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpoolWithHistory'
+        '404':
+          description: Top spool not found 
+  /spools/archived:
+    get:
+      summary: Get a list of all archived spools with their usage history
+      responses:
+        '200':
+          description: A list of archived spools successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpoolWithHistory'
+  /spools/sort/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The unique identifier of the spool to sort
+        schema:
+          type: integer
+    put:
+      summary: Update the sort order of a specific spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SortSpoolRequest'
+      responses:
+        '200':
+          description: Spool sort order updated successfully
+  /spools/archive/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The unique identifier of the spool to archive/unarchive
+        schema:
+          type: integer
+    put:
+      summary: Update the archive status of a specific spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveSpoolRequest'
+      responses:
+        '200':
+          description: Spool archive status updated successfully
+  /spools/{id}/history:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The unique identifier of the spool to get history for
+        schema:
+          type: integer
+    get:
+      summary: Get usage history for a specific spool
+      responses:
+        '200':
+          description: Spool usage history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsageHistoryEntry'
+  /spools/{spoolId}/history/{entryId}:
+    parameters:
+      - name: spoolId
+        in: path
+        required: true
+        description: The unique identifier of the spool
+        schema:
+          type: integer
+      - name: entryId
+        in: path
+        required: true
+        description: The unique identifier of the usage history entry
+        schema:
+          type: integer
+    put:
+      summary: Update a usage entry for a spool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUsageHistoryEntryRequest'
+      responses:
+        '200':
+          description: Spool usage history entry updated successfully
+    delete:
+      summary: Delete a usage entry for a spool
+      responses:
+        '200':
+          description: Spool usage history entry deleted successfully
+components:
+  schemas:
+    SpoolWithHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+        initialWeight:
+          type: integer
+        currentWeight:
+          type: integer
+        sort_order:
+          type: integer
+        is_archived:
+          type: integer
+        usage_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageHistoryEntry'
+    UsageHistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        spool_id:
+          type: integer
+        used_amount:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+        note:
+          type: string
+    NewSpoolRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+        initialWeight:
+          type: integer
+    NewSpoolResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        sortOrder:
+          type: integer
+    UpdateSpoolRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+        currentWeight:
+          type: integer
+    UpdateSpoolResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        spool:
+          $ref: '#/components/schemas/SpoolWithHistory'
+    UseSpoolRequest:
+      type: object
+      properties:
+        weight:
+          type: integer
+        note:
+          type: string
+        filePath:
+          type: string
+    UseSpoolResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        historyId:
+          type: integer
+    SortSpoolRequest:
+      type: object
+      properties:
+        sortOrder:
+          type: integer
+    ArchiveSpoolRequest:
+      type: object
+      properties:
+        isArchived:
+          type: integer
+    UpdateUsageHistoryEntryRequest:
+      type: object
+      properties:
+        used_amount:
+          type: integer
+        note:
+          type: string

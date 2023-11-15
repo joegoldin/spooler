@@ -25,12 +25,13 @@ function UseSpool({ onUse, spools }) {
       <div className="card-body">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Weight Used:</label>
+            <label>Weight Used (g):</label>
             <input
               type="number"
               className="form-control"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
+              placeholder="Weight Used (g)"
               required
             />
           </div>
