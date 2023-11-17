@@ -77,27 +77,39 @@ app.post("/spools", (req, res) => {
 app.get("/spools", (req, res) => {
   db.all(
     `SELECT spools.*, 
-    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history_json
-    FROM spools
-    LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
-    WHERE spools.is_archived = 0
-    GROUP BY spools.id
-    ORDER BY spools.sort_order`,
+    (
+      SELECT json_group_array(sub.json_value)
+      FROM (
+        SELECT json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note) AS json_value
+        FROM spool_usage_history AS history
+        WHERE spools.id = history.spool_id
+        ORDER BY history.timestamp DESC
+      ) AS sub
+    ) AS usage_history_json
+FROM spools
+WHERE spools.is_archived = 0
+GROUP BY spools.id
+ORDER BY spools.sort_order`,
     [],
     (err, rows) => {
       if (err) {
         throw err;
       }
       // Convert the usage_history_json string to an actual JSON array and filter out null entries
-      const rowsWithFilteredHistory = rows.map(row => {
+      const rowsWithFilteredHistory = rows.map((row) => {
         let usageHistory = JSON.parse(row.usage_history_json);
         // Filter out any entries that are completely null
-        usageHistory = usageHistory.filter(entry => entry.id !== null);
+        usageHistory = usageHistory.filter((entry) => entry.id !== null);
+        // Parse each entry into a JSON object
+        usageHistory = usageHistory.map((entry) => JSON.parse(entry));
         // If after filtering there are no entries, exclude the usage_history property
         if (usageHistory.length === 0) {
           const { usage_history_json, ...rest } = row;
           return rest;
         }
+        // remove the usage_history_json property
+        delete row.usage_history_json;
+
         // Otherwise, include the filtered usage_history
         return { ...row, usage_history: usageHistory };
       });
@@ -109,12 +121,19 @@ app.get("/spools", (req, res) => {
 app.get("/spools/archived", (req, res) => {
   db.all(
     `SELECT spools.*, 
-    json_group_array(json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note)) as usage_history_json
-    FROM spools
-    LEFT JOIN spool_usage_history as history ON spools.id = history.spool_id
-    WHERE spools.is_archived = 1
-    GROUP BY spools.id
-    ORDER BY spools.sort_order`,
+    (
+      SELECT json_group_array(sub.json_value)
+      FROM (
+        SELECT json_object('id', history.id, 'used_amount', history.used_amount, 'timestamp', history.timestamp, 'note', history.note) AS json_value
+        FROM spool_usage_history AS history
+        WHERE spools.id = history.spool_id
+        ORDER BY history.timestamp
+      ) AS sub
+    ) AS usage_history_json
+FROM spools
+WHERE spools.is_archived = 1
+GROUP BY spools.id
+ORDER BY spools.sort_order`,
     [],
     (err, rows) => {
       if (err) {
@@ -125,11 +144,16 @@ app.get("/spools/archived", (req, res) => {
         let usageHistory = JSON.parse(row.usage_history_json);
         // Filter out any entries that are completely null
         usageHistory = usageHistory.filter((entry) => entry.id !== null);
+        // Parse each entry into a JSON object
+        usageHistory = usageHistory.map((entry) => JSON.parse(entry));
         // If after filtering there are no entries, exclude the usage_history property
         if (usageHistory.length === 0) {
           const { usage_history_json, ...rest } = row;
           return rest;
         }
+        // remove the usage_history_json property
+        delete row.usage_history_json;
+
         // Otherwise, include the filtered usage_history
         return { ...row, usage_history: usageHistory };
       });
