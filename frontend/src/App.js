@@ -4,10 +4,17 @@ import AddSpool from "./components/AddSpool";
 import EditSpool from "./components/EditSpool";
 import UseSpool from "./components/UseSpool";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
   const [spools, setSpools] = useState([]);
   const [archivedSpools, setArchivedSpools] = useState([]);
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraUrl, setCameraUrl] = useState(
+    "http://192.168.1.135:8080/?action=stream"
+  );
+  const [cameraWidth, setCameraWidth] = useState(640);
+  const [cameraHeight, setCameraHeight] = useState(480);
   const [editingSpool, setEditingSpool] = useState(null);
   const [editingHistoryEntry, setEditingHistoryEntry] = useState(null);
 
@@ -25,6 +32,22 @@ function App() {
   useEffect(() => {
     fetchSpools();
   }, []);
+ 
+  const handleCameraCheckboxChange = (e) => {
+    setShowCamera(e.target.checked);
+  };
+
+  const handleCameraUrlChange = (e) => {
+    setCameraUrl(e.target.value);
+  };
+
+  const handleCameraWidthChange = (e) => {
+    setCameraWidth(e.target.value);
+  }
+
+  const handleCameraHeightChange = (e) => {
+    setCameraHeight(e.target.value);
+  }
 
   const handleEditInit = (spool) => {
     setEditingSpool(spool);
@@ -164,6 +187,85 @@ function App() {
         <h1 className="mb-4" style={{ verticalAlign: "middle" }}>
           Spooler
         </h1>
+
+        <div className="text-center mb-3" style={{ verticalAlign: "middle" }}>
+          <div className="row">
+            <div className="col text-center">
+              <div className="form-check form-switch d-inline-block">
+                <i className="fas fa-print mr-2"></i>
+                &nbsp;
+                <i className="fas fa-video mr-2"></i>
+                <input
+                  type="checkbox"
+                  id="showCamera"
+                  checked={showCamera}
+                  onChange={handleCameraCheckboxChange}
+                  className="form-check-input"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {showCamera && (
+          <div className="mb-4">
+            <div className="card shadow">
+              <div className="card-header">3D Printer Camera</div>
+              <div className="card-body">
+                <div className="input-group mb-3">
+                  <span className="input-group-text">URL:</span>
+                  <input
+                    type="text"
+                    value={cameraUrl}
+                    onChange={handleCameraUrlChange}
+                    className="form-control"
+                    placeholder="Enter camera stream URL"
+                  />
+                </div>
+                <div className="row g-3 mb-3">
+                  <div className="col">
+                    <div className="input-group">
+                      <span className="input-group-text">Width:</span>
+                      <input
+                        type="number"
+                        value={cameraWidth}
+                        onChange={handleCameraWidthChange}
+                        className="form-control"
+                        placeholder="640"
+                      />
+                    </div>
+                  </div>
+                  <div className="col">
+                    <div className="input-group">
+                      <span className="input-group-text">Height:</span>
+                      <input
+                        type="number"
+                        value={cameraHeight}
+                        onChange={handleCameraHeightChange}
+                        className="form-control"
+                        placeholder="480"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ background: "#000", padding: "1rem" }}
+                >
+                  <iframe
+                    src={cameraUrl}
+                    title="3D Printer Camera"
+                    frameBorder="0"
+                    style={{
+                      width: `${cameraWidth}px`,
+                      height: `${cameraHeight}px`,
+                      maxWidth: "100%",
+                    }}
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <br />
       {editingSpool ? (
