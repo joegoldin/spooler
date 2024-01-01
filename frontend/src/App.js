@@ -249,7 +249,7 @@ function App() {
                 </div>
                 <div
                   className="d-flex justify-content-center align-items-center"
-                  style={{ background: "#000", padding: "1rem" }}
+                  style={{ background: "#fff", padding: "1rem" }}
                 >
                   <iframe
                     src={cameraUrl}
